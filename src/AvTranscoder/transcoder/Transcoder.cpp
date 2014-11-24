@@ -390,7 +390,17 @@ void Transcoder::addTranscodeStream( const std::string& filename, const size_t s
 	// Create profile as input configuration
 	NoDisplayProgress progress;
 	referenceFile->analyse( progress, InputFile::eAnalyseLevelFast );
-	AudioProperties audioProperties = referenceFile->getProperties().audioStreams.at( streamIndex );
+	
+	AudioProperties audioProperties;
+	for( size_t i = 0; i < referenceFile->getProperties().audioStreams.size(); i++ )
+	{
+		if( referenceFile->getProperties().audioStreams.at( i ).streamId == streamIndex )
+		{
+			audioProperties = referenceFile->getProperties().audioStreams.at( i );
+		}
+	}
+	if( audioProperties.bit_rate == 0 )
+		throw std::runtime_error( "cannot set audio stream properties" );
 
 	ProfileLoader::Profile profile;
 	profile[ constants::avProfileIdentificator ] = "presetRewrap";
