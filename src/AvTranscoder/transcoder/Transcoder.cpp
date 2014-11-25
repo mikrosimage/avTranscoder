@@ -391,25 +391,25 @@ void Transcoder::addTranscodeStream( const std::string& filename, const size_t s
 	NoDisplayProgress progress;
 	referenceFile->analyse( progress, eAnalyseLevelHeader );
 	
-	AudioProperties audioProperties;
+	const AudioProperties* audioProperties = NULL;
 	for( size_t i = 0; i < referenceFile->getProperties().getAudioProperties().size(); i++ )
 	{
-		if( referenceFile->getProperties().getAudioProperties().at( i ).streamId == streamIndex )
+		if( referenceFile->getProperties().getAudioProperties().at( i ).getStreamId() == streamIndex )
 		{
-			audioProperties = referenceFile->getProperties().getAudioProperties().at( i );
+			audioProperties = &referenceFile->getProperties().getAudioProperties().at( i );
 		}
 	}
-	if( audioProperties.bit_rate == 0 )
+	if( audioProperties == NULL )
 		throw std::runtime_error( "cannot set audio stream properties" );
 
 	ProfileLoader::Profile profile;
 	profile[ constants::avProfileIdentificator ] = "presetRewrap";
 	profile[ constants::avProfileIdentificatorHuman ] = "Preset rewrap";
 	profile[ constants::avProfileType ] = avtranscoder::constants::avProfileTypeAudio;
-	profile[ constants::avProfileCodec ] = audioProperties.getCodecName();
-	profile[ constants::avProfileSampleFormat ] = audioProperties.getSampleFormatName();
+	profile[ constants::avProfileCodec ] = audioProperties->getCodecName();
+	profile[ constants::avProfileSampleFormat ] = audioProperties->getSampleFormatName();
 	std::stringstream ss;
-	ss << audioProperties.getSampleRate();
+	ss << audioProperties->getSampleRate();
 	profile[ constants::avProfileSampleRate ] = ss.str();
 	profile[ constants::avProfileChannel ] = "1";
 
