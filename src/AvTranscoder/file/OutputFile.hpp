@@ -109,7 +109,7 @@ public:
 
 	virtual void setVerbose( bool verbose = false ){ _verbose = verbose; }
 	
-	AVFormatContext& getFormatContext() { return *_formatContext; }
+	virtual double getProgressDuration();
 
 private:
 	std::vector<AvOutputStream*> _outputStreams;
