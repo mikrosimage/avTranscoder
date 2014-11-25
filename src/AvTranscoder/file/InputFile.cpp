@@ -151,7 +151,7 @@ bool InputFile::readNextPacket( const size_t streamIndex )
 	while( 1 )
 	{
 		int ret = av_read_frame( _formatContext, &packet );
-		if( ret < 0 ) // error or end of file
+		if( ret < 0 || packet.size == 0 ) // error or end of file
 		{
 			av_free_packet( &packet );
 			return false;

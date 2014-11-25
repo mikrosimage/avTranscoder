@@ -317,10 +317,7 @@ void Transcoder::process( IProgress& progress )
 		if( ! frameProcessed )
 			break;	
 
-		AVStream* firstOutputStream = _outputFile.getFormatContext().streams[0];
-		double duration = av_q2d( firstOutputStream->time_base ) * firstOutputStream->cur_dts;
-
-		if( progress.progress( duration, totalDuration ) == eJobStatusCancel )
+		if( progress.progress( _outputFile.getProgressDuration(), totalDuration ) == eJobStatusCancel )
 		{
 			break;
 		}
@@ -393,16 +390,26 @@ void Transcoder::addTranscodeStream( const std::string& filename, const size_t s
 	// Create profile as input configuration
 	NoDisplayProgress progress;
 	referenceFile->analyse( progress, eAnalyseLevelHeader );
-	AudioProperties audioProperties = referenceFile->getProperties().getAudioProperties().at( streamIndex );
+	
+	const AudioProperties* audioProperties = NULL;
+	for( size_t i = 0; i < referenceFile->getProperties().getAudioProperties().size(); i++ )
+	{
+		if( referenceFile->getProperties().getAudioProperties().at( i ).getStreamId() == streamIndex )
+		{
+			audioProperties = &referenceFile->getProperties().getAudioProperties().at( i );
+		}
+	}
+	if( audioProperties == NULL )
+		throw std::runtime_error( "cannot set audio stream properties" );
 
 	ProfileLoader::Profile profile;
 	profile[ constants::avProfileIdentificator ] = "presetRewrap";
 	profile[ constants::avProfileIdentificatorHuman ] = "Preset rewrap";
 	profile[ constants::avProfileType ] = avtranscoder::constants::avProfileTypeAudio;
-	profile[ constants::avProfileCodec ] = audioProperties.getCodecName();
-	profile[ constants::avProfileSampleFormat ] = audioProperties.getSampleFormatName();
+	profile[ constants::avProfileCodec ] = audioProperties->getCodecName();
+	profile[ constants::avProfileSampleFormat ] = audioProperties->getSampleFormatName();
 	std::stringstream ss;
-	ss << audioProperties.getSampleRate();
+	ss << audioProperties->getSampleRate();
 	profile[ constants::avProfileSampleRate ] = ss.str();
 	profile[ constants::avProfileChannel ] = "1";
 
