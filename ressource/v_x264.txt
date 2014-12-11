@@ -1,0 +1,6 @@
+avProfileName=x264
+avProfileLongName=x264
+avProfileType=avProfileTypeVideo
+codec=libx264
+pix_fmt=yuv422p
+r=25
