@@ -496,7 +496,7 @@ double Transcoder::getTotalDurationFromProcessMethod() const
 			return getMaxTotalDuration();
 		case eProcessMethodBasedOnStream :
 			return getStreamDuration( _mainStreamIndex );
-		case eProcessMethodForceDuration :
+		case eProcessMethodBasedOnDuration :
 			return _outputDuration;
 		case eProcessMethodInfinity :
 			return std::numeric_limits<double>::max();
@@ -529,7 +529,7 @@ void Transcoder::manageInfinityStreamFromProcessMethod()
 				else
 					_streamTranscoders.at( i )->canSwitchToGenerator( false );
 				break;
-			case eProcessMethodForceDuration :
+			case eProcessMethodBasedOnDuration :
 				if( _streamTranscoders.at( i )->getDuration() > _outputDuration )
 					_streamTranscoders.at( i )->canSwitchToGenerator( false );
 				else

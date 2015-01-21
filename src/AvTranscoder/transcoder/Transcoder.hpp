@@ -20,7 +20,7 @@ namespace avtranscoder
  * eProcessMethodShortest: stop transcode at the end of the shortest stream.
  * eProcessMethodLongest: stop transcode at the end of the longest stream.
  * eProcessMethodBasedOnStream: stop transcode at the end of an indicated stream (@see _indexBasedStream attribute of Transcoder).
- * eProcessMethodForceDuration: stop transcode at the end of an indicated duration (@see _outputDuration attribute of Transcoder).
+ * eProcessMethodBasedOnDuration: stop transcode at the end of an indicated duration (@see _outputDuration attribute of Transcoder).
  * eProcessMethodInfinity: stop transcode by outside of avTranscoder (streaming mode)
  */
 enum EProcessMethod
@@ -28,7 +28,7 @@ enum EProcessMethod
 	eProcessMethodShortest = 0,
 	eProcessMethodLongest,
 	eProcessMethodBasedOnStream,
-	eProcessMethodForceDuration,
+	eProcessMethodBasedOnDuration,
 	eProcessMethodInfinity,
 };
 
@@ -126,7 +126,7 @@ public:
 	 * @brief Set the transcodage politic.
 	 * @note By default eProcessMethodLongest based on stream 0.
 	 * @param indexBasedStream: in case of process method eProcessMethodBasedOnStream, stop transcode at the end of the indicated stream.
-	 * @param outputDuration: in case of process method eProcessMethodForceDuration, stop transcode at the end of the indicated duration.
+	 * @param outputDuration: in case of process method eProcessMethodBasedOnDuration, stop transcode at the end of the indicated duration.
 	 */
 	void setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream = 0, const size_t outputDuration = 0 );
 
@@ -186,7 +186,7 @@ private:
 
 	EProcessMethod _eProcessMethod;  ///< Transcoding policy
 	size_t _mainStreamIndex;  ///< Index of stream used to stop the process of transcode in case of eProcessMethodBasedOnStream.
-	size_t _outputDuration;  ///< Duration of output media used to stop the process of transcode in case of eProcessMethodForceDuration.
+	size_t _outputDuration;  ///< Duration of output media used to stop the process of transcode in case of eProcessMethodBasedOnDuration.
 
 	bool    _verbose;
 };
