@@ -183,7 +183,7 @@ StreamTranscoder::StreamTranscoder(
 	, _subStreamIndex( -1 )
 	, _frameProcessed( 0 )
 	, _offset( 0 )
-	, _takeFromGenerator( false )
+	, _takeFromGenerator( true )
 	, _verbose( false )
 	, _offsetPassed( true )
 	, _infinityStream( false )
