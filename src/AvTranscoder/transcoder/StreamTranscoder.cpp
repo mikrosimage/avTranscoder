@@ -38,7 +38,7 @@ StreamTranscoder::StreamTranscoder(
 	, _offset( 0 )
 	, _takeFromGenerator( false )
 	, _verbose( false )
-	, _offsetPassed( false )
+	, _offsetPassed( true )
 	, _infinityStream( false )
 {
 	// create a re-wrapping case
@@ -85,7 +85,7 @@ StreamTranscoder::StreamTranscoder(
 	, _offset( offset )
 	, _takeFromGenerator( false )
 	, _verbose( false )
-	, _offsetPassed( false )
+	, _offsetPassed( offset ? false : true )
 	, _infinityStream( false )
 {
 	// create a transcode case
@@ -185,7 +185,7 @@ StreamTranscoder::StreamTranscoder(
 	, _offset( 0 )
 	, _takeFromGenerator( false )
 	, _verbose( false )
-	, _offsetPassed( false )
+	, _offsetPassed( true )
 	, _infinityStream( false )
 {
 	if( profile.find( constants::avProfileType )->second == constants::avProfileTypeVideo )
