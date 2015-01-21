@@ -19,6 +19,7 @@ Transcoder::Transcoder( OutputFile& outputFile )
 	, _profileLoader( true )
 	, _eProcessMethod ( eProcessMethodLongest )
 	, _mainStreamIndex( 0 )
+	, _outputDuration( 0 )
 	, _verbose( false )
 {
 	// Initialize the OutputFile
@@ -289,6 +290,12 @@ void Transcoder::process( IProgress& progress )
 		frameProcessed =  processFrame();
 
 		double progressDuration = _outputFile.getProgressDuration();
+
+		// check progressDuration
+		if( progressDuration > totalDuration)
+			break;
+
+		// check if JobStatusCancel
 		if( progress.progress( ( progressDuration > totalDuration )? totalDuration : progressDuration, totalDuration ) == eJobStatusCancel )
 			break;
 
@@ -301,10 +308,11 @@ void Transcoder::process( IProgress& progress )
 	_outputFile.endWrap();
 }
 
-void Transcoder::setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream )
+void Transcoder::setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream, const size_t outputDuration )
 {
 	_eProcessMethod	= eProcessMethod;
 	_mainStreamIndex = indexBasedStream;
+	_outputDuration = outputDuration;
 }
 
 void Transcoder::setVerbose( bool verbose )
@@ -488,6 +496,8 @@ double Transcoder::getTotalDurationFromProcessMethod() const
 			return getMaxTotalDuration();
 		case eProcessMethodBasedOnStream :
 			return getStreamDuration( _mainStreamIndex );
+		case eProcessMethodForceDuration :
+			return _outputDuration;
 		case eProcessMethodInfinity :
 			return std::numeric_limits<double>::max();
 		default:
@@ -518,6 +528,12 @@ void Transcoder::manageInfinityStreamFromProcessMethod()
 					_streamTranscoders.at( i )->setInfinityStream( true );
 				else
 					_streamTranscoders.at( i )->setInfinityStream( false );
+				break;
+			case eProcessMethodForceDuration :
+				if( _streamTranscoders.at( i )->getDuration() > _outputDuration )
+					_streamTranscoders.at( i )->setInfinityStream( false );
+				else
+					_streamTranscoders.at( i )->setInfinityStream( true );
 				break;
 			case eProcessMethodInfinity :
 				_streamTranscoders.at( i )->setInfinityStream( true );
