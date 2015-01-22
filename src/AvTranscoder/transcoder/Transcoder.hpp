@@ -20,7 +20,7 @@ namespace avtranscoder
  * eProcessMethodShortest: stop transcode at the end of the shortest stream.
  * eProcessMethodLongest: stop transcode at the end of the longest stream.
  * eProcessMethodBasedOnStream: stop transcode at the end of an indicated stream (@see _indexBasedStream attribute of Transcoder).
- * eProcessMethodBasedOnDuration: stop transcode at the end of an indicated duration (@see _outputDuration attribute of Transcoder).
+ * eProcessMethodBasedOnDuration: stop transcode at the end of an indicated duration, in seconds (@see _outputDuration attribute of Transcoder).
  * eProcessMethodInfinity: stop transcode by outside of avTranscoder (streaming mode)
  */
 enum EProcessMethod
@@ -148,18 +148,18 @@ private:
 	InputFile* addInputFile( const std::string& filename, const size_t streamIndex );
 
 	/**
-	 * @brief Get the duration of the stream.
+	 * @brief Get the duration of the stream, in seconds
 	 */
 	double getStreamDuration( size_t indexStream ) const;
 
 	/**
-	* @brief Get the duration of the shortest stream.
+	* @brief Get the duration of the shortest stream, in seconds
 	* @note if there is only generated streams, return limit of double.
 	*/
 	double getMinTotalDuration() const;
 
 	/**
-	 * @brief Get the duration of the longest stream.
+	 * @brief Get the duration of the longest stream, in seconds
 	 * @note if there is only generated streams, return limit of double.
 	 */
 	double getMaxTotalDuration() const;
