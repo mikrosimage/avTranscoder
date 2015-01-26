@@ -35,7 +35,7 @@ public:
 	size_t getTicksPerFrame() const;
 	Rational getTimeBase() const;
 	double getFps() const;  ///< Corresponds to the number of audio samples for one video frame
-	double getDuration() const;
+	double getDuration() const;  ///< in seconds
 
 	PropertiesMap& getMetadatas() { return _metadatas; }
 

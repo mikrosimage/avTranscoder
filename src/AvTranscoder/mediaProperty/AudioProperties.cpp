@@ -193,9 +193,9 @@ double AudioProperties::getFps() const
 
 double AudioProperties::getDuration() const
 {
-	Rational timeBase = getTimeBase();
-	double duration = ( timeBase.num / (double) timeBase.den ) * _formatContext->streams[_streamId]->duration;
-	return duration;
+	if( ! _formatContext )
+		throw std::runtime_error( "unknown format context" );
+	return 1.0 * _formatContext->duration / AV_TIME_BASE;
 }
 
 PropertiesMap AudioProperties::getPropertiesAsMap() const

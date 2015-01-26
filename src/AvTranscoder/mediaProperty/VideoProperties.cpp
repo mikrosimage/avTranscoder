@@ -479,9 +479,9 @@ double VideoProperties::getFps() const
 
 double VideoProperties::getDuration() const
 {
-	Rational timeBase = getTimeBase();
-	double duration = ( timeBase.num / (double) timeBase.den ) * _formatContext->streams[_streamId]->duration;
-	return duration;
+	if( ! _formatContext )
+		throw std::runtime_error( "unknown format context" );
+	return 1.0 * _formatContext->duration / AV_TIME_BASE;
 }
 
 bool VideoProperties::hasBFrames() const
