@@ -138,6 +138,23 @@ double InputStream::getDuration() const
 	return duration;
 }
 
+double InputStream::getFps() const
+{
+	double fps = 1.;
+	switch( getStreamType() )
+	{
+		case AVMEDIA_TYPE_VIDEO:
+			fps = _inputFile->getProperties().getVideoProperties().at( _streamIndex ).getFps();
+			break;
+		case AVMEDIA_TYPE_AUDIO:
+			fps = _inputFile->getProperties().getAudioProperties().at( _streamIndex ).getFps();
+			break;
+		default:
+			break;
+	}
+	return fps;
+}
+
 void InputStream::addPacket( AVPacket& packet )
 {
 	// Do not cache data if the stream is declared as unused in process

@@ -23,6 +23,7 @@ public:
 
 	size_t getStreamIndex() const { return _streamIndex; }
 	double getDuration() const;
+	double getFps() const;
 	AVMediaType getStreamType() const;
 
 	VideoCodec& getVideoCodec();

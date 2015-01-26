@@ -398,7 +398,9 @@ double StreamTranscoder::getDuration() const
 	{
 		double totalDuration = 0;
 		totalDuration += _inputStream->getDuration();
-		// @todo add offset
+		double fps = _inputStream->getFps();
+		if( fps > 0 )
+			totalDuration += _offset / fps;
 		return totalDuration;
 	}
 	else

@@ -23,6 +23,7 @@ public:
 
 	virtual size_t getStreamIndex() const = 0;
 	virtual double getDuration() const = 0;  ///< Get duration of the stream, in seconds
+	virtual double getFps() const { return 1.; }  ///< Return 1 if unknown (data stream...)
 	virtual AVMediaType getStreamType() const = 0;
 
 	//@{
