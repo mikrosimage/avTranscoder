@@ -123,7 +123,19 @@ AVMediaType InputStream::getStreamType() const
 
 double InputStream::getDuration() const
 {
-	return 1.0 * _inputFile->getFormatContext().getDuration() / AV_TIME_BASE;
+	double duration = 1.;
+	switch( getStreamType() )
+	{
+		case AVMEDIA_TYPE_VIDEO:
+			duration = _inputFile->getProperties().getVideoProperties().at( _streamIndex ).getDuration();
+			break;
+		case AVMEDIA_TYPE_AUDIO:
+			duration = _inputFile->getProperties().getAudioProperties().at( _streamIndex ).getDuration();
+			break;
+		default:
+			break;
+	}
+	return duration;
 }
 
 void InputStream::addPacket( AVPacket& packet )
