@@ -184,11 +184,7 @@ Rational AudioProperties::getTimeBase() const
 
 double AudioProperties::getFps() const
 {
-	Rational timeBase = getTimeBase();
-	double fps = timeBase.den / (double) timeBase.num;
-	if( isinf( fps ) )
-		fps = 0.0;
-	return fps;
+	return getNbSamples() / getDuration();
 }
 
 double AudioProperties::getDuration() const
