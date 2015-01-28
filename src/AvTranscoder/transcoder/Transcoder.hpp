@@ -123,8 +123,8 @@ public:
 	StreamTranscoder& getStreamTranscoder( size_t streamIndex ) const { return *_streamTranscoders.at( streamIndex ); }
 
 	/**
-	 * @brief Set the transcodage politic.
-	 * @note By default eProcessMethodLongest based on stream 0.
+	 * @brief Set the transcoding policy.
+	 * @note By default eProcessMethodBasedOnStream at index 0.
 	 * @param indexBasedStream: in case of process method eProcessMethodBasedOnStream, stop transcode at the end of the indicated stream.
 	 * @param outputDuration: in case of process method eProcessMethodBasedOnDuration, stop transcode at the end of the indicated duration.
 	 */
@@ -148,19 +148,18 @@ private:
 	InputFile* addInputFile( const std::string& filename, const size_t streamIndex );
 
 	/**
-	 * @brief Get the duration of the stream, in seconds
+	 * @brief Get the duration of the stream.
+	 * @note If the stream is a generator, return limit of double.
 	 */
 	double getStreamDuration( size_t indexStream ) const;
 
 	/**
-	* @brief Get the duration of the shortest stream, in seconds
-	* @note if there is only generated streams, return limit of double.
+	* @brief Get the duration of the shortest stream.
 	*/
 	double getMinTotalDuration() const;
 
 	/**
-	 * @brief Get the duration of the longest stream, in seconds
-	 * @note if there is only generated streams, return limit of double.
+	 * @brief Get the duration of the longest stream.
 	 */
 	double getMaxTotalDuration() const;
 
@@ -168,7 +167,7 @@ private:
 	 * @brief Get the duration of the output program
 	 * @note Depends on the streams, the process method, and the main stream index.
          */
-	double getTotalDurationFromProcessMethod() const;
+	double getOutputDuration() const;
 
 	/**
 	 * @brief Set for each StreamTranscoder if it is an infinity stream (switch to generator at the end of the stream).

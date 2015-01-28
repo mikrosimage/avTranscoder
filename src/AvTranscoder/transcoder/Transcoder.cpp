@@ -17,7 +17,7 @@ Transcoder::Transcoder( OutputFile& outputFile )
 	, _streamTranscoders()
 	, _streamTranscodersAllocated()
 	, _profileLoader( true )
-	, _eProcessMethod ( eProcessMethodLongest )
+	, _eProcessMethod ( eProcessMethodBasedOnStream )
 	, _mainStreamIndex( 0 )
 	, _outputDuration( 0 )
 	, _verbose( false )
@@ -278,7 +278,7 @@ void Transcoder::process( IProgress& progress )
 
 	preProcessCodecLatency();
 
-	double totalDuration = getTotalDurationFromProcessMethod();
+	double totalDuration = getOutputDuration();
 
 	size_t frame = 0;
 	bool frameProcessed = true;
@@ -486,7 +486,7 @@ double Transcoder::getMaxTotalDuration() const
 	return maxTotalDuration;
 }
 
-double Transcoder::getTotalDurationFromProcessMethod() const
+double Transcoder::getOutputDuration() const
 {
 	switch( _eProcessMethod )
 	{
