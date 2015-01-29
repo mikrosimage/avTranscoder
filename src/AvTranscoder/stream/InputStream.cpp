@@ -123,7 +123,7 @@ AVMediaType InputStream::getStreamType() const
 
 double InputStream::getDuration() const
 {
-	double duration = 1.;
+	double duration = 0.;
 	switch( getStreamType() )
 	{
 		case AVMEDIA_TYPE_VIDEO:
