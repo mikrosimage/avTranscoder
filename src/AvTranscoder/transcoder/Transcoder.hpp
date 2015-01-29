@@ -128,7 +128,7 @@ public:
 	 * @param indexBasedStream: in case of process method eProcessMethodBasedOnStream, stop transcode at the end of the indicated stream.
 	 * @param outputDuration: in case of process method eProcessMethodBasedOnDuration, stop transcode at the end of the indicated duration.
 	 */
-	void setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream = 0, const size_t outputDuration = 0 );
+	void setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream = 0, const double outputDuration = 0 );
 
 	/**
 	 * @brief Set verbose mode for the Transcoder, its streams, and its output file.
@@ -185,7 +185,7 @@ private:
 
 	EProcessMethod _eProcessMethod;  ///< Transcoding policy
 	size_t _mainStreamIndex;  ///< Index of stream used to stop the process of transcode in case of eProcessMethodBasedOnStream.
-	size_t _outputDuration;  ///< Duration of output media used to stop the process of transcode in case of eProcessMethodBasedOnDuration.
+	double _outputDuration;  ///< Duration of output media used to stop the process of transcode in case of eProcessMethodBasedOnDuration.
 
 	bool    _verbose;
 };

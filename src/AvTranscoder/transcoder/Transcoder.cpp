@@ -308,7 +308,7 @@ void Transcoder::process( IProgress& progress )
 	_outputFile.endWrap();
 }
 
-void Transcoder::setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream, const size_t outputDuration )
+void Transcoder::setProcessMethod( const EProcessMethod eProcessMethod, const size_t indexBasedStream, const double outputDuration )
 {
 	_eProcessMethod	= eProcessMethod;
 	_mainStreamIndex = indexBasedStream;
