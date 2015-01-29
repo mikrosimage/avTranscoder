@@ -146,9 +146,6 @@ double InputStream::getFps() const
 		case AVMEDIA_TYPE_VIDEO:
 			fps = _inputFile->getProperties().getVideoPropertiesWithStreamIndex( _streamIndex ).getFps();
 			break;
-		case AVMEDIA_TYPE_AUDIO:
-			fps = _inputFile->getProperties().getAudioPropertiesWithStreamIndex( _streamIndex ).getFps();
-			break;
 		default:
 			break;
 	}

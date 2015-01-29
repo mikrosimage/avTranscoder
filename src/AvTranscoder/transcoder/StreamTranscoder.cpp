@@ -67,7 +67,7 @@ StreamTranscoder::StreamTranscoder(
 		OutputFile& outputFile,
 		const ProfileLoader::Profile& profile,
 		const int subStreamIndex,
-		const size_t offset
+		const double offset
 	)
 	: _inputStream( &inputStream )
 	, _outputStream( NULL )
@@ -327,9 +327,23 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 		std::cout << "transcode a frame " << std::endl;
 
 	// check offset
-	if( _offset && _frameProcessed == _offset + 1 )
+	if( _offset ) 
 	{
-		switchToInputDecoder();
+		bool endOfOffset = false;
+		switch( _inputStream->getStreamType() )
+		{
+			case AVMEDIA_TYPE_VIDEO:
+				endOfOffset = ( ( _frameProcessed / _inputStream->getFps() ) >= _offset ) ? true : false;
+				break;
+			// @todo: manage audio offset
+			default:
+				break;
+		}
+		if( endOfOffset )
+		{
+			_offset = 0;
+			switchToInputDecoder();
+		}
 	}
 
 	bool decodingStatus = false;
@@ -398,9 +412,7 @@ double StreamTranscoder::getDuration() const
 	{
 		double totalDuration = 0;
 		totalDuration += _inputStream->getDuration();
-		double fps = _inputStream->getFps();
-		if( fps > 0 )
-			totalDuration += _offset / fps;
+		totalDuration += _offset;
 		return totalDuration;
 	}
 	else
