@@ -127,10 +127,10 @@ double InputStream::getDuration() const
 	switch( getStreamType() )
 	{
 		case AVMEDIA_TYPE_VIDEO:
-			duration = _inputFile->getProperties().getVideoProperties().at( _streamIndex ).getDuration();
+			duration = _inputFile->getProperties().getVideoPropertiesWithStreamIndex( _streamIndex ).getDuration();
 			break;
 		case AVMEDIA_TYPE_AUDIO:
-			duration = _inputFile->getProperties().getAudioProperties().at( _streamIndex ).getDuration();
+			duration = _inputFile->getProperties().getAudioPropertiesWithStreamIndex( _streamIndex ).getDuration();
 			break;
 		default:
 			break;
@@ -144,10 +144,10 @@ double InputStream::getFps() const
 	switch( getStreamType() )
 	{
 		case AVMEDIA_TYPE_VIDEO:
-			fps = _inputFile->getProperties().getVideoProperties().at( _streamIndex ).getFps();
+			fps = _inputFile->getProperties().getVideoPropertiesWithStreamIndex( _streamIndex ).getFps();
 			break;
 		case AVMEDIA_TYPE_AUDIO:
-			fps = _inputFile->getProperties().getAudioProperties().at( _streamIndex ).getFps();
+			fps = _inputFile->getProperties().getAudioPropertiesWithStreamIndex( _streamIndex ).getFps();
 			break;
 		default:
 			break;
