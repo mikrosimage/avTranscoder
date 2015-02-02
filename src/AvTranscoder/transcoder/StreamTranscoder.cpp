@@ -1,4 +1,3 @@
-
 #include "StreamTranscoder.hpp"
 
 #include <AvTranscoder/stream/InputStream.hpp>
@@ -7,6 +6,7 @@
 #include <AvTranscoder/decoder/AudioDecoder.hpp>
 #include <AvTranscoder/decoder/VideoGenerator.hpp>
 #include <AvTranscoder/decoder/AudioGenerator.hpp>
+
 #include <AvTranscoder/encoder/VideoEncoder.hpp>
 #include <AvTranscoder/encoder/AudioEncoder.hpp>
 
@@ -326,7 +326,7 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	if( _verbose )
 		std::cout << "transcode a frame " << std::endl;
 
-	// check offset
+	// manage offset
 	if( _offset ) 
 	{
 		bool endOfOffset = false;
@@ -338,7 +338,12 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 				endOfOffset = ( _frameProcessed / desc.getFps() ) >= _offset;
 				break;
 			}
-			// @todo: manage audio offset
+			case AVMEDIA_TYPE_AUDIO:
+			{
+				AudioFrameDesc desc = _inputStream->getAudioCodec().getAudioFrameDesc();
+				endOfOffset = ( _frameProcessed / desc.getFps() ) >= _offset;
+				break;
+			}
 			default:
 				break;
 		}
