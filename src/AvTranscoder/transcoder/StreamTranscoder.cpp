@@ -333,8 +333,11 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 		switch( _inputStream->getStreamType() )
 		{
 			case AVMEDIA_TYPE_VIDEO:
-				endOfOffset = ( ( _frameProcessed / _inputStream->getFps() ) >= _offset ) ? true : false;
+			{
+				VideoFrameDesc desc = _inputStream->getVideoCodec().getVideoFrameDesc();
+				endOfOffset = ( _frameProcessed / desc.getFps() ) >= _offset;
 				break;
+			}
 			// @todo: manage audio offset
 			default:
 				break;
