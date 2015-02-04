@@ -34,7 +34,6 @@ StreamTranscoder::StreamTranscoder(
 	, _outputEncoder( NULL )
 	, _transform( NULL )
 	, _subStreamIndex( -1 )
-	, _frameProcessed( 0 )
 	, _offset( 0 )
 	, _canSwitchToGenerator( false )
 	, _verbose( false )
@@ -79,7 +78,6 @@ StreamTranscoder::StreamTranscoder(
 	, _outputEncoder( NULL )
 	, _transform( NULL )
 	, _subStreamIndex( subStreamIndex )
-	, _frameProcessed( 0 )
 	, _offset( offset )
 	, _canSwitchToGenerator( false )
 	, _verbose( false )
@@ -177,7 +175,6 @@ StreamTranscoder::StreamTranscoder(
 	, _outputEncoder( NULL )
 	, _transform( NULL )
 	, _subStreamIndex( -1 )
-	, _frameProcessed( 0 )
 	, _offset( 0 )
 	, _canSwitchToGenerator( false )
 	, _verbose( false )
@@ -274,8 +271,6 @@ void StreamTranscoder::preProcessCodecLatency()
 
 bool StreamTranscoder::processFrame()
 {
-	++_frameProcessed;
-
 	if( ! _inputDecoder )
 	{
 		return processRewrap();
@@ -329,24 +324,7 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	// manage offset
 	if( _offset ) 
 	{
-		bool endOfOffset = false;
-		switch( _inputStream->getStreamType() )
-		{
-			case AVMEDIA_TYPE_VIDEO:
-			{
-				VideoFrameDesc desc = _inputStream->getVideoCodec().getVideoFrameDesc();
-				endOfOffset = ( _frameProcessed / desc.getFps() ) >= _offset;
-				break;
-			}
-			case AVMEDIA_TYPE_AUDIO:
-			{
-				AudioFrameDesc desc = _inputStream->getAudioCodec().getAudioFrameDesc();
-				endOfOffset = ( _frameProcessed / desc.getFps() ) >= _offset;
-				break;
-			}
-			default:
-				break;
-		}
+		bool endOfOffset = _outputStream->getStreamDuration() >= _offset ? true : false;
 		if( endOfOffset )
 		{
 			_offset = 0;

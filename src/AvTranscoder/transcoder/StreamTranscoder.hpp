@@ -98,7 +98,6 @@ private:
 
 	int  _subStreamIndex;  ///< Index of channel that is processed from the input stream (-1 if no demultiplexing).
 
-	size_t _frameProcessed;  ///< How many frames have been processed by the StreamTranscoder.
 	double _offset;  ///< Offset, in seconds, at the beginning of the StreamTranscoder.
 
 	bool _canSwitchToGenerator;  ///< Automatically switch to a generator at the end of the stream
