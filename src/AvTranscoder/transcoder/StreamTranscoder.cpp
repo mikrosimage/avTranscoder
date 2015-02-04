@@ -22,7 +22,7 @@ namespace avtranscoder
 
 StreamTranscoder::StreamTranscoder(
 		IInputStream& inputStream,
-		OutputFile& outputFile
+		IOutputFile& outputFile
 	)
 	: _inputStream( &inputStream )
 	, _outputStream( NULL )
@@ -64,7 +64,7 @@ StreamTranscoder::StreamTranscoder(
 
 StreamTranscoder::StreamTranscoder(
 		IInputStream& inputStream,
-		OutputFile& outputFile,
+		IOutputFile& outputFile,
 		const ProfileLoader::Profile& profile,
 		const int subStreamIndex,
 		const double offset
@@ -164,7 +164,7 @@ StreamTranscoder::StreamTranscoder(
 
 StreamTranscoder::StreamTranscoder(
 		const ICodec& inputCodec,
-		OutputFile& outputFile,
+		IOutputFile& outputFile,
 		const ProfileLoader::Profile& profile
 	)
 	: _inputStream( NULL )
