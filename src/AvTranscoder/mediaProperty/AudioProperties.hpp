@@ -25,7 +25,8 @@ public:
 	std::string getChannelName() const;
 	std::string getChannelDescription() const;
 
-	size_t getStreamId() const { return _streamId; }
+	size_t getStreamIndex() const { return _streamIndex; }
+	size_t getStreamId() const;
 	size_t getCodecId() const;
 	size_t getSampleRate() const;
 	size_t getChannels() const;
@@ -34,8 +35,7 @@ public:
 
 	size_t getTicksPerFrame() const;
 	Rational getTimeBase() const;
-	double getFps() const;  ///< Corresponds to the number of audio samples for one video frame
-	double getDuration() const;
+	double getDuration() const;  ///< in seconds
 
 	PropertiesMap& getMetadatas() { return _metadatas; }
 
@@ -51,7 +51,7 @@ private:
 	AVCodecContext* _codecContext;  ///< Has link (no ownership)
 	AVCodec* _codec; ///< Has link (no ownership)
 
-	size_t _streamId;
+	size_t _streamIndex;
 	PropertiesMap _metadatas;
 };
 

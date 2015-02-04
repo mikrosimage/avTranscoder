@@ -24,7 +24,7 @@ public:
 		: _sampleRate( sampleRate )
 		, _channels( channels )
 		, _sampleFormat( sampleFormat )
-		, _fps( 25. )
+		, _fps( 1. )
 	{}
 	/**
 	 * @warning FPS value is set to 25 by default
@@ -33,7 +33,7 @@ public:
 		: _sampleRate( sampleRate )
 		, _channels( channels )
 		, _sampleFormat( av_get_sample_fmt( sampleFormat.c_str() ) )
-		, _fps( 25. )
+		, _fps( 1. )
 	{}
 
 	size_t getSampleRate() const { return _sampleRate; }
@@ -51,7 +51,7 @@ public:
 		if( _sampleFormat == AV_SAMPLE_FMT_NONE )
 			throw std::runtime_error( "incorrect sample format" );
 
-		size_t size = _sampleRate * _channels * av_get_bytes_per_sample( _sampleFormat );
+		size_t size = ( _sampleRate / _fps ) * _channels * av_get_bytes_per_sample( _sampleFormat );
 		if( size == 0 )
 			throw std::runtime_error( "unable to determine audio buffer size" );
 
@@ -66,8 +66,18 @@ public:
 	
 	void setParameters( const ProfileLoader::Profile& profile )
 	{
-		if( profile.find( constants::avProfileSampleFormat ) != profile.end() )
+		// sample rate
+		if( profile.count( constants::avProfileSampleRate ) )
+			setSampleRate( atoi( profile.find( constants::avProfileSampleRate )->second.c_str() ) );
+		// channels
+		if( profile.count( constants::avProfileChannel ) )
+			setChannels( atoi( profile.find( constants::avProfileChannel )->second.c_str() ) );
+		// sample format	
+		if( profile.count( constants::avProfileSampleFormat ) )
 			setSampleFormat( profile.find( constants::avProfileSampleFormat )->second );
+		// fps
+		if( profile.count( constants::avProfileFrameRate ) )
+			setFps( atof( profile.find( constants::avProfileFrameRate )->second.c_str() ) );
 	}
 
 private:
