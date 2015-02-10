@@ -1,6 +1,9 @@
 import sys
 
-from AvTranscoder import AvTranscoder
+from pyAvTranscoder import avtranscoder as av
+
+av.preloadCodecsAndFormats()
+
 
 def parseConfigFile( inputConfigFile, transcoder ):
 	"""
@@ -29,17 +32,13 @@ if len(sys.argv) < 3:
 	exit(1)
 
 # create Transcoder
-ouputFile = AvTranscoder.OutputFile( sys.argv[2] )
-transcoder = AvTranscoder.Transcoder( ouputFile )
+ouputFile = av.OutputFile( sys.argv[2] )
+transcoder = av.Transcoder( ouputFile )
 
 # parse configuration file
 inputConfigFile = sys.argv[1]
 parseConfigFile( inputConfigFile, transcoder )
 
-# initialize Transcoder
-transcoder.setProcessMethod( AvTranscoder.eProcessMethodLongest )
-transcoder.init()
-
 # Process transcode
-progress = AvTranscoder.ProgressListener()
+progress = av.ConsoleProgress()
 transcoder.process( progress )
