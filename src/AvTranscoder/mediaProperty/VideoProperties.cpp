@@ -392,7 +392,20 @@ size_t VideoProperties::getBitRate() const
 {
 	if( ! _codecContext )
 		throw std::runtime_error( "unknown codec context" );
-	return _codecContext->bit_rate;
+
+	// return bit rate of stream
+	if( _codecContext->bit_rate )
+		return _codecContext->bit_rate;
+
+	// else get computed bit rate from format and other streams
+	size_t totalBitRate = _formatContext->bit_rate;
+	for( size_t streamIndex = 0; streamIndex < _formatContext->nb_streams; ++streamIndex )
+	{
+		if( streamIndex == getStreamIndex() )
+			continue;
+		totalBitRate -= _formatContext->streams[streamIndex]->codec->bit_rate;
+	}
+	return totalBitRate;
 }
 
 size_t VideoProperties::getMaxBitRate() const
