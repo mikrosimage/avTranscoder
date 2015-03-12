@@ -28,20 +28,20 @@ void PixelProperties::init( const AVPixelFormat avPixelFormat )
 std::string PixelProperties::getPixelName() const
 {
 	if( ! _pixelDesc )
-		throw std::runtime_error( "unable to find pixel description." ); 
+		throw std::runtime_error( "unable to find pixel description" ); 
 
 	if( _pixelDesc && _pixelDesc->name )
 		return std::string( _pixelDesc->name );
-	return "unknown pixel name";
+	throw std::runtime_error( "unknown pixel name" );
 }
 
 std::string PixelProperties::getPixelFormatName() const
 {
 	if( ! _pixelFormat )
-		throw std::runtime_error( "unable to find pixel format." ); 
+		throw std::runtime_error( "unable to find pixel format" ); 
 
 	const char* formatName = av_get_pix_fmt_name( _pixelFormat );
-	return formatName ? std::string( formatName ) : "unknown pixel format";
+	return formatName ? std::string( formatName ) : throw std::runtime_error( "unknown pixel format" );
 }
 
 size_t PixelProperties::getBitsPerPixel() const
@@ -222,79 +222,100 @@ PropertiesMap PixelProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	detail::add( dataMap, "pixelName", getPixelName() );
-	detail::add( dataMap, "pixelFormatName", getPixelFormatName() );
-	detail::add( dataMap, "bitDepth", getBitsPerPixel() );
-	detail::add( dataMap, "nbComponents", getNbComponents() );
-	detail::add( dataMap, "chromaWidth", getChromaWidth() );
-	detail::add( dataMap, "chromaHeight", getChromaHeight() );
+	try{ detail::add( dataMap, "pixelName", getPixelName() ); } catch(std::exception& e){ detail::add( dataMap, "pixelName", e.what() ); }
+	try{ detail::add( dataMap, "pixelFormatName", getPixelFormatName() ); } catch(std::exception& e){ detail::add( dataMap, "pixelFormatName", e.what() );}
+	try{ detail::add( dataMap, "bitDepth", getBitsPerPixel() ); } catch(std::exception& e){ detail::add( dataMap, "bitDepth", getBitsPerPixel() ); }
+	try{ detail::add( dataMap, "nbComponents", getNbComponents() ); } catch(std::exception& e){ detail::add( dataMap, "nbComponents", getNbComponents() ); }
+	try{ detail::add( dataMap, "chromaWidth", getChromaWidth() ); } catch(std::exception& e){ detail::add( dataMap, "chromaWidth", getChromaWidth() ); }
+	try{ detail::add( dataMap, "chromaHeight", getChromaHeight() ); } catch(std::exception& e){ detail::add( dataMap, "chromaHeight", getChromaHeight() ); }
 
-	std::string colorComponents;
-	switch( getColorComponents() )
+	try
 	{
-		case eComponentGray:
-			colorComponents = "gray";
-			break;
-		case eComponentRgb:
-			colorComponents = "RGB";
-			break;
-		case eComponentYuvJPEG:
-			colorComponents = "YUVJPEG";
-			break;
-		case eComponentYuvA:
-			colorComponents = "YUVA";
-			break;
-		case eComponentYuv:
-			colorComponents = "YUV";
-			break;
+		std::string colorComponents;
+		switch( getColorComponents() )
+		{
+			case eComponentGray:
+				colorComponents = "gray";
+				break;
+			case eComponentRgb:
+				colorComponents = "RGB";
+				break;
+			case eComponentYuvJPEG:
+				colorComponents = "YUVJPEG";
+				break;
+			case eComponentYuvA:
+				colorComponents = "YUVA";
+				break;
+			case eComponentYuv:
+				colorComponents = "YUV";
+				break;
+		}
+		detail::add( dataMap, "colorComponents", colorComponents );
 	}
-	detail::add( dataMap, "colorComponents", colorComponents );
-
-	std::string subsampling;
-	switch( getSubsampling() )
+	catch(std::exception& e)
 	{
-		case eSubsampling440:
-			subsampling = "440";
-			break;
-		case eSubsampling422:
-			subsampling = "422";
-			break;
-		case eSubsampling420:
-			subsampling = "420";
-			break;
-		case eSubsampling411:
-			subsampling = "411";
-			break;
-		case eSubsampling410:
-			subsampling = "410";
-			break;
-		case eSubsamplingNone:
-			subsampling = "None";
-			break;
+		detail::add( dataMap, "colorComponents", e.what() );
 	}
-	detail::add( dataMap, "subsampling", subsampling );
 
-	detail::add( dataMap, "isBigEndian", isBigEndian() );
-	detail::add( dataMap, "hasAlpha", hasAlpha() );
-	detail::add( dataMap, "isPlanar", isPlanar() );
-	detail::add( dataMap, "isIndexedColors", isIndexedColors() );
-	detail::add( dataMap, "bitWiseAcked", isBitWisePacked() );
-	detail::add( dataMap, "isHardwareAccelerated", isHardwareAccelerated() );
-	detail::add( dataMap, "rgbPixel", isRgbPixelData() );
-	detail::add( dataMap, "isPseudoPaletted", isPseudoPaletted() );
-
-	std::vector<Channel> channels = getChannels();
-	for( size_t channelIndex = 0; channelIndex < channels.size(); ++channelIndex )
+	try
 	{
-		std::stringstream channelName;
-		channelName << "channel_" << channels.at( channelIndex ).id;
-	
-		std::stringstream channelValue;
-		channelValue << "chromaHeight " << channels.at( channelIndex ).chromaHeight;
-		channelValue << " - ";
-		channelValue << "bitStep " << channels.at( channelIndex ).bitStep;
+		std::string subsampling;
+		switch( getSubsampling() )
+		{
+			case eSubsampling440:
+				subsampling = "440";
+				break;
+			case eSubsampling422:
+				subsampling = "422";
+				break;
+			case eSubsampling420:
+				subsampling = "420";
+				break;
+			case eSubsampling411:
+				subsampling = "411";
+				break;
+			case eSubsampling410:
+				subsampling = "410";
+				break;
+			case eSubsamplingNone:
+				subsampling = "None";
+				break;
+		}
+		detail::add( dataMap, "subsampling", subsampling );
+	}
+	catch(std::exception& e)
+	{
+		detail::add( dataMap, "subsampling", e.what() );
+	}
 
-		detail::add( dataMap, channelName.str(), channelValue.str() );
+	try{ detail::add( dataMap, "isBigEndian", isBigEndian() ); } catch(std::exception& e){ detail::add( dataMap, "isBigEndian", e.what() ); }
+	try{ detail::add( dataMap, "hasAlpha", hasAlpha() ); } catch(std::exception& e){ detail::add( dataMap, "hasAlpha", e.what() ); }
+	try{ detail::add( dataMap, "isPlanar", isPlanar() ); } catch(std::exception& e){ detail::add( dataMap, "isPlanar", e.what() ); }
+	try{ detail::add( dataMap, "isIndexedColors", isIndexedColors() ); } catch(std::exception& e){ detail::add( dataMap, "isIndexedColors", e.what() ); }
+	try{ detail::add( dataMap, "bitWiseAcked", isBitWisePacked() ); } catch(std::exception& e){ detail::add( dataMap, "bitWiseAcked", e.what() ); }
+	try{ detail::add( dataMap, "isHardwareAccelerated", isHardwareAccelerated() ); } catch(std::exception& e){ detail::add( dataMap, "isHardwareAccelerated", e.what() ); }
+	try{ detail::add( dataMap, "rgbPixel", isRgbPixelData() ); } catch(std::exception& e){ detail::add( dataMap, "rgbPixel", e.what() ); }
+	try{ detail::add( dataMap, "isPseudoPaletted", isPseudoPaletted() ); } catch(std::exception& e){ detail::add( dataMap, "isPseudoPaletted", e.what() ); }
+
+	try
+	{
+		std::vector<Channel> channels = getChannels();
+		for( size_t channelIndex = 0; channelIndex < channels.size(); ++channelIndex )
+		{
+			std::stringstream channelName;
+			channelName << "channel_" << channels.at( channelIndex ).id;
+
+			std::stringstream channelValue;
+			channelValue << "chromaHeight " << channels.at( channelIndex ).chromaHeight;
+			channelValue << " - ";
+			channelValue << "bitStep " << channels.at( channelIndex ).bitStep;
+
+			detail::add( dataMap, channelName.str(), channelValue.str() );
+		}
+	}
+	catch(std::exception& e)
+	{
+		detail::add( dataMap, "channels", e.what() );
 	}
 
 	return dataMap;
