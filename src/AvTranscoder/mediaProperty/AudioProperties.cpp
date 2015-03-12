@@ -40,31 +40,31 @@ std::string AudioProperties::getCodecName() const
 {
 	if( _codec && _codec->name )
 		return std::string( _codec->name );
-	return "unknown codec";
+	throw std::runtime_error( "unknown codec name" );
 }
 
 std::string AudioProperties::getCodecLongName() const
 {
 	if( _codec && _codec->long_name )
 		return std::string( _codec->long_name );
-	return "unknown codec";
+	throw std::runtime_error( "unknown codec long name" );
 }
 
 std::string AudioProperties::getSampleFormatName() const
 {
 	if( ! _codecContext )
-		return "unknown codec context";
+		throw std::runtime_error( "unknown codec context" );
 
 	const char* fmtName = av_get_sample_fmt_name( _codecContext->sample_fmt );
 	if( fmtName )
 		return std::string( fmtName );
-	return "unknown sample format";
+	throw std::runtime_error( "unknown sample format name" );
 }
 
 std::string AudioProperties::getSampleFormatLongName() const
 {
 	if( ! _codecContext )
-		return "unknown codec context";
+		throw std::runtime_error( "unknown codec context" );
 
 	switch( _codecContext->sample_fmt )
 	{
@@ -93,13 +93,13 @@ std::string AudioProperties::getSampleFormatLongName() const
 		case AV_SAMPLE_FMT_NB:
 			return "number of sample formats";
 	}
-	return "unknown sample format";
+	throw std::runtime_error( "unknown sample format long name" );
 }
 
 std::string AudioProperties::getChannelLayout() const
 {
 	if( ! _codecContext )
-		return "unknown codec context";
+		throw std::runtime_error( "unknown codec context" );
 
 	char buf1[1024];
 	av_get_channel_layout_string( buf1, sizeof( buf1 ), -1, _codecContext->channel_layout );
@@ -109,18 +109,18 @@ std::string AudioProperties::getChannelLayout() const
 std::string AudioProperties::getChannelName() const
 {
 	if( ! _codecContext )
-		return "unknown codec context";
+		throw std::runtime_error( "unknown codec context" );
 
 	const char* channelName = av_get_channel_name( _codecContext->channel_layout );
 	if( channelName )
 		return std::string( channelName );
-	return "unknown channel name";
+	throw std::runtime_error( "unknown channel name" );
 }
 
 std::string AudioProperties::getChannelDescription() const
 {
 	if( ! _codecContext )
-		return "unknown codec context";
+		throw std::runtime_error( "unknown codec context" );
 
 #ifdef FF_RESAMPLE_LIBRARY
 	const char* channelDescription = av_get_channel_description( _codecContext->channel_layout );
@@ -128,7 +128,7 @@ std::string AudioProperties::getChannelDescription() const
 		return std::string( channelDescription );
 	return "unknown channel description";
 #else
-	return "can't access channel description";
+	throw std::runtime_error( "can't access channel description" );
 #endif
 }
 
@@ -199,22 +199,22 @@ PropertiesMap AudioProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	detail::add( dataMap, "streamId", getStreamId() );
-	detail::add( dataMap, "codecId", getCodecId() );
-	detail::add( dataMap, "codecName", getCodecName() );
-	detail::add( dataMap, "codecLongName", getCodecLongName() );
-	detail::add( dataMap, "sampleFormatName", getSampleFormatName() );
-	detail::add( dataMap, "sampleFormatLongName", getSampleFormatLongName() );
-	detail::add( dataMap, "sampleRate", getSampleRate() );
-	detail::add( dataMap, "bitRate", getBitRate() );
-	detail::add( dataMap, "nbSamples", getNbSamples() );
-	detail::add( dataMap, "channels", getChannels() );
-	detail::add( dataMap, "channelLayout", getChannelLayout() );
-	detail::add( dataMap, "channelName", getChannelName() );
-	detail::add( dataMap, "channelDescription", getChannelDescription() );
-	detail::add( dataMap, "ticksPerFrame", getTicksPerFrame() );
-	detail::add( dataMap, "timeBase", getTimeBase() );
-	detail::add( dataMap, "duration", getDuration() );
+	try{ detail::add( dataMap, "streamId", getStreamId() ); } catch(std::exception& e){ detail::add( dataMap, "streamId", e.what() ); }
+	try{ detail::add( dataMap, "codecId", getCodecId() ); } catch(std::exception& e){ detail::add( dataMap, "codecId", e.what() ); }
+	try{ detail::add( dataMap, "codecName", getCodecName() ); } catch(std::exception& e){ detail::add( dataMap, "codecName", e.what() ); }
+	try{ detail::add( dataMap, "codecLongName", getCodecLongName() ); } catch(std::exception& e){ detail::add( dataMap, "codecLongName", e.what() ); }
+	try{ detail::add( dataMap, "sampleFormatName", getSampleFormatName() ); } catch(std::exception& e){ detail::add( dataMap, "sampleFormatName", e.what() ); }
+	try{ detail::add( dataMap, "sampleFormatLongName", getSampleFormatLongName() ); } catch(std::exception& e){ detail::add( dataMap, "sampleFormatLongName", e.what() ); }
+	try{ detail::add( dataMap, "sampleRate", getSampleRate() ); } catch(std::exception& e){ detail::add( dataMap, "sampleRate", e.what() ); }
+	try{ detail::add( dataMap, "bitRate", getBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "bitRate", e.what() ); }
+	try{ detail::add( dataMap, "nbSamples", getNbSamples() ); } catch(std::exception& e){ detail::add( dataMap, "nbSamples", e.what() ); }
+	try{ detail::add( dataMap, "channels", getChannels() ); } catch(std::exception& e){ detail::add( dataMap, "channels", e.what() ); }
+	try{ detail::add( dataMap, "channelLayout", getChannelLayout() ); } catch(std::exception& e){ detail::add( dataMap, "channelLayout", e.what() ); }
+	try{ detail::add( dataMap, "channelName", getChannelName() ); } catch(std::exception& e){ detail::add( dataMap, "channelName", e.what() ); }
+	try{ detail::add( dataMap, "channelDescription", getChannelDescription() ); } catch(std::exception& e){ detail::add( dataMap, "channelDescription", e.what() ); }
+	try{ detail::add( dataMap, "ticksPerFrame", getTicksPerFrame() ); } catch(std::exception& e){ detail::add( dataMap, "ticksPerFrame", e.what() ); }
+	try{ detail::add( dataMap, "timeBase", getTimeBase() ); } catch(std::exception& e){ detail::add( dataMap, "timeBase", e.what() ); }
+	try{ detail::add( dataMap, "duration", getDuration() ); } catch(std::exception& e){ detail::add( dataMap, "duration", e.what() ); }
 
 	for( size_t metadataIndex = 0; metadataIndex < _metadatas.size(); ++metadataIndex )
 	{
