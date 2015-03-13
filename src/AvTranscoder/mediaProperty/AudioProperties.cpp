@@ -122,7 +122,7 @@ std::string AudioProperties::getChannelDescription() const
 	if( ! _codecContext )
 		return "unknown codec context";
 
-#ifdef FF_RESAMPLE_LIBRARY
+#ifdef AVTRANSCODER_FFMPEG_DEPENDENCY
 	const char* channelDescription = av_get_channel_description( _codecContext->channel_layout );
 	if( channelDescription )
 		return std::string( channelDescription );
