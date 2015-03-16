@@ -133,15 +133,15 @@ PropertiesMap FileProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	try{ detail::add( dataMap, "filename", getFilename() ); } catch(std::exception& e){ detail::add( dataMap, "filename", e.what() ); }
-	try{ detail::add( dataMap, "formatName", getFormatName() ); } catch(std::exception& e){ detail::add( dataMap, "formatName", e.what() ); }
-	try{ detail::add( dataMap, "formatLongName", getFormatLongName() ); } catch(std::exception& e){ detail::add( dataMap, "formatLongName", e.what() ); }
+	addProperty( dataMap, "filename", &FileProperties::getFilename );
+	addProperty( dataMap, "formatName", &FileProperties::getFormatName );
+	addProperty( dataMap, "formatLongName", &FileProperties::getFormatLongName );
 
-	try{ detail::add( dataMap, "startTime", getStartTime() ); } catch(std::exception& e){ detail::add( dataMap, "startTime", e.what() ); }
-	try{ detail::add( dataMap, "duration", getDuration() ); } catch(std::exception& e){ detail::add( dataMap, "duration", e.what() ); }
-	try{ detail::add( dataMap, "bitrate", getBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "bitrate", e.what() ); }
-	try{ detail::add( dataMap, "numberOfStreams", getNbStreams() ); } catch(std::exception& e){ detail::add( dataMap, "numberOfStreams", e.what() ); }
-	try{ detail::add( dataMap, "numberOfPrograms", getProgramsCount() ); } catch(std::exception& e){ detail::add( dataMap, "numberOfPrograms", e.what() ); }
+	addProperty( dataMap, "startTime", &FileProperties::getStartTime );
+	addProperty( dataMap, "duration", &FileProperties::getDuration );
+	addProperty( dataMap, "bitrate", &FileProperties::getBitRate );
+	addProperty( dataMap, "numberOfStreams", &FileProperties::getNbStreams );
+	addProperty( dataMap, "numberOfPrograms", &FileProperties::getProgramsCount );
 
 	detail::add( dataMap, "numberOfVideoStreams", getNbVideoStreams() );
 	detail::add( dataMap, "numberOfAudioStreams", getNbAudioStreams() );
