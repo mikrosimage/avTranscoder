@@ -199,22 +199,22 @@ PropertiesMap AudioProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	try{ detail::add( dataMap, "streamId", getStreamId() ); } catch(std::exception& e){ detail::add( dataMap, "streamId", e.what() ); }
-	try{ detail::add( dataMap, "codecId", getCodecId() ); } catch(std::exception& e){ detail::add( dataMap, "codecId", e.what() ); }
-	try{ detail::add( dataMap, "codecName", getCodecName() ); } catch(std::exception& e){ detail::add( dataMap, "codecName", e.what() ); }
-	try{ detail::add( dataMap, "codecLongName", getCodecLongName() ); } catch(std::exception& e){ detail::add( dataMap, "codecLongName", e.what() ); }
-	try{ detail::add( dataMap, "sampleFormatName", getSampleFormatName() ); } catch(std::exception& e){ detail::add( dataMap, "sampleFormatName", e.what() ); }
-	try{ detail::add( dataMap, "sampleFormatLongName", getSampleFormatLongName() ); } catch(std::exception& e){ detail::add( dataMap, "sampleFormatLongName", e.what() ); }
-	try{ detail::add( dataMap, "sampleRate", getSampleRate() ); } catch(std::exception& e){ detail::add( dataMap, "sampleRate", e.what() ); }
-	try{ detail::add( dataMap, "bitRate", getBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "bitRate", e.what() ); }
-	try{ detail::add( dataMap, "nbSamples", getNbSamples() ); } catch(std::exception& e){ detail::add( dataMap, "nbSamples", e.what() ); }
-	try{ detail::add( dataMap, "channels", getChannels() ); } catch(std::exception& e){ detail::add( dataMap, "channels", e.what() ); }
-	try{ detail::add( dataMap, "channelLayout", getChannelLayout() ); } catch(std::exception& e){ detail::add( dataMap, "channelLayout", e.what() ); }
-	try{ detail::add( dataMap, "channelName", getChannelName() ); } catch(std::exception& e){ detail::add( dataMap, "channelName", e.what() ); }
-	try{ detail::add( dataMap, "channelDescription", getChannelDescription() ); } catch(std::exception& e){ detail::add( dataMap, "channelDescription", e.what() ); }
-	try{ detail::add( dataMap, "ticksPerFrame", getTicksPerFrame() ); } catch(std::exception& e){ detail::add( dataMap, "ticksPerFrame", e.what() ); }
-	try{ detail::add( dataMap, "timeBase", getTimeBase() ); } catch(std::exception& e){ detail::add( dataMap, "timeBase", e.what() ); }
-	try{ detail::add( dataMap, "duration", getDuration() ); } catch(std::exception& e){ detail::add( dataMap, "duration", e.what() ); }
+	addProperty( dataMap, "streamId", &AudioProperties::getStreamId );
+	addProperty( dataMap, "codecId", &AudioProperties::getCodecId );
+	addProperty( dataMap, "codecName", &AudioProperties::getCodecName );
+	addProperty( dataMap, "codecLongName", &AudioProperties::getCodecLongName );
+	addProperty( dataMap, "sampleFormatName", &AudioProperties::getSampleFormatName );
+	addProperty( dataMap, "sampleFormatLongName", &AudioProperties::getSampleFormatLongName );
+	addProperty( dataMap, "sampleRate", &AudioProperties::getSampleRate );
+	addProperty( dataMap, "bitRate", &AudioProperties::getBitRate );
+	addProperty( dataMap, "nbSamples", &AudioProperties::getNbSamples );
+	addProperty( dataMap, "channels", &AudioProperties::getChannels );
+	addProperty( dataMap, "channelLayout", &AudioProperties::getChannelLayout );
+	addProperty( dataMap, "channelName", &AudioProperties::getChannelName );
+	addProperty( dataMap, "channelDescription", &AudioProperties::getChannelDescription );
+	addProperty( dataMap, "ticksPerFrame", &AudioProperties::getTicksPerFrame );
+	addProperty( dataMap, "timeBase", &AudioProperties::getTimeBase );
+	addProperty( dataMap, "duration", &AudioProperties::getDuration );
 
 	for( size_t metadataIndex = 0; metadataIndex < _metadatas.size(); ++metadataIndex )
 	{
