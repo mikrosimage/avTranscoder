@@ -223,12 +223,12 @@ PropertiesMap PixelProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	try{ detail::add( dataMap, "pixelName", getPixelName() ); } catch(std::exception& e){ detail::add( dataMap, "pixelName", e.what() ); }
-	try{ detail::add( dataMap, "pixelFormatName", getPixelFormatName() ); } catch(std::exception& e){ detail::add( dataMap, "pixelFormatName", e.what() );}
-	try{ detail::add( dataMap, "bitDepth", getBitsPerPixel() ); } catch(std::exception& e){ detail::add( dataMap, "bitDepth", getBitsPerPixel() ); }
-	try{ detail::add( dataMap, "nbComponents", getNbComponents() ); } catch(std::exception& e){ detail::add( dataMap, "nbComponents", getNbComponents() ); }
-	try{ detail::add( dataMap, "chromaWidth", getChromaWidth() ); } catch(std::exception& e){ detail::add( dataMap, "chromaWidth", getChromaWidth() ); }
-	try{ detail::add( dataMap, "chromaHeight", getChromaHeight() ); } catch(std::exception& e){ detail::add( dataMap, "chromaHeight", getChromaHeight() ); }
+	addProperty( dataMap, "pixelName", &PixelProperties::getPixelName );
+	addProperty( dataMap, "pixelFormatName", &PixelProperties::getPixelFormatName );
+	addProperty( dataMap, "bitDepth", &PixelProperties::getBitsPerPixel );
+	addProperty( dataMap, "nbComponents", &PixelProperties::getNbComponents );
+	addProperty( dataMap, "chromaWidth", &PixelProperties::getChromaWidth );
+	addProperty( dataMap, "chromaHeight", &PixelProperties::getChromaHeight );
 
 	try
 	{
@@ -289,14 +289,14 @@ PropertiesMap PixelProperties::getPropertiesAsMap() const
 		detail::add( dataMap, "subsampling", e.what() );
 	}
 
-	try{ detail::add( dataMap, "isBigEndian", isBigEndian() ); } catch(std::exception& e){ detail::add( dataMap, "isBigEndian", e.what() ); }
-	try{ detail::add( dataMap, "hasAlpha", hasAlpha() ); } catch(std::exception& e){ detail::add( dataMap, "hasAlpha", e.what() ); }
-	try{ detail::add( dataMap, "isPlanar", isPlanar() ); } catch(std::exception& e){ detail::add( dataMap, "isPlanar", e.what() ); }
-	try{ detail::add( dataMap, "isIndexedColors", isIndexedColors() ); } catch(std::exception& e){ detail::add( dataMap, "isIndexedColors", e.what() ); }
-	try{ detail::add( dataMap, "bitWiseAcked", isBitWisePacked() ); } catch(std::exception& e){ detail::add( dataMap, "bitWiseAcked", e.what() ); }
-	try{ detail::add( dataMap, "isHardwareAccelerated", isHardwareAccelerated() ); } catch(std::exception& e){ detail::add( dataMap, "isHardwareAccelerated", e.what() ); }
-	try{ detail::add( dataMap, "rgbPixel", isRgbPixelData() ); } catch(std::exception& e){ detail::add( dataMap, "rgbPixel", e.what() ); }
-	try{ detail::add( dataMap, "isPseudoPaletted", isPseudoPaletted() ); } catch(std::exception& e){ detail::add( dataMap, "isPseudoPaletted", e.what() ); }
+	addProperty( dataMap, "isBigEndian", &PixelProperties::isBigEndian );
+	addProperty( dataMap, "hasAlpha", &PixelProperties::hasAlpha );
+	addProperty( dataMap, "isPlanar", &PixelProperties::isPlanar );
+	addProperty( dataMap, "isIndexedColors", &PixelProperties::isIndexedColors );
+	addProperty( dataMap, "bitWiseAcked", &PixelProperties::isBitWisePacked );
+	addProperty( dataMap, "isHardwareAccelerated", &PixelProperties::isHardwareAccelerated );
+	addProperty( dataMap, "rgbPixel", &PixelProperties::isRgbPixelData );
+	addProperty( dataMap, "isPseudoPaletted", &PixelProperties::isPseudoPaletted );
 
 	try
 	{
