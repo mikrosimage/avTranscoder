@@ -590,36 +590,36 @@ PropertiesMap VideoProperties::getPropertiesAsMap() const
 {
 	PropertiesMap dataMap;
 
-	try{ detail::add( dataMap, "streamId", getStreamId() ); } catch(std::exception& e){ detail::add( dataMap, "streamId", e.what() ); }
-	try{ detail::add( dataMap, "codecId", getCodecId() ); } catch(std::exception& e){ detail::add( dataMap, "codecId", e.what() ); }
-	try{ detail::add( dataMap, "codecName", getCodecName() ); } catch(std::exception& e){ detail::add( dataMap, "codecName", e.what() ); }
-	try{ detail::add( dataMap, "codecLongName", getCodecLongName() ); } catch(std::exception& e){ detail::add( dataMap, "codecLongName", e.what() ); }
-	try{ detail::add( dataMap, "profile", getProfile() ); } catch(std::exception& e){ detail::add( dataMap, "profile", e.what() ); }
-	try{ detail::add( dataMap, "profileName", getProfileName() ); } catch(std::exception& e){ detail::add( dataMap, "profileName", e.what() ); }
-	try{ detail::add( dataMap, "level", getLevel() ); } catch(std::exception& e){ detail::add( dataMap, "level", e.what() ); }
-	try{ detail::add( dataMap, "startTimecode", getStartTimecodeString() ); } catch(std::exception& e){ detail::add( dataMap, "startTimecode", e.what() ); }
-	try{ detail::add( dataMap, "width", getWidth() ); } catch(std::exception& e){ detail::add( dataMap, "width", e.what() ); }
-	try{ detail::add( dataMap, "height", getHeight() ); } catch(std::exception& e){ detail::add( dataMap, "height", e.what() ); }
-	try{ detail::add( dataMap, "pixelAspectRatio", getSar().num / getSar().den ); } catch(std::exception& e){ detail::add( dataMap, "pixelAspectRatio", e.what() ); }
-	try{ detail::add( dataMap, "displayAspectRatio", getDar().num / getDar().den ); } catch(std::exception& e){ detail::add( dataMap, "displayAspectRatio", e.what() ); }
-	try{ detail::add( dataMap, "dtgActiveFormat", getDtgActiveFormat() ); } catch(std::exception& e){ detail::add( dataMap, "dtgActiveFormat", e.what() ); }
-	try{ detail::add( dataMap, "colorTransfert", getColorTransfert() ); } catch(std::exception& e){ detail::add( dataMap, "colorTransfert", e.what() ); }
-	try{ detail::add( dataMap, "colorspace", getColorspace() ); } catch(std::exception& e){ detail::add( dataMap, "colorspace", e.what() ); }
-	try{ detail::add( dataMap, "colorRange", getColorRange() ); } catch(std::exception& e){ detail::add( dataMap, "colorRange", e.what() ); }
-	try{ detail::add( dataMap, "colorPrimaries", getColorPrimaries() ); } catch(std::exception& e){ detail::add( dataMap, "colorPrimaries", e.what() ); }
-	try{ detail::add( dataMap, "chromaSampleLocation", getChromaSampleLocation() ); } catch(std::exception& e){ detail::add( dataMap, "chromaSampleLocation", e.what() ); }
-	try{ detail::add( dataMap, "interlaced ", isInterlaced() ); } catch(std::exception& e){ detail::add( dataMap, "interlaced", e.what() ); }
-	try{ detail::add( dataMap, "topFieldFirst", isTopFieldFirst() ); } catch(std::exception& e){ detail::add( dataMap, "topFieldFirst", e.what() ); }
-	try{ detail::add( dataMap, "fieldOrder", getFieldOrder() ); } catch(std::exception& e){ detail::add( dataMap, "fieldOrder", e.what() ); }
-	try{ detail::add( dataMap, "timeBase", getTimeBase() ); } catch(std::exception& e){ detail::add( dataMap, "timeBase", e.what() ); }
-	try{ detail::add( dataMap, "duration", getDuration() ); } catch(std::exception& e){ detail::add( dataMap, "duration", e.what() ); }
-	try{ detail::add( dataMap, "fps", getFps() ); } catch(std::exception& e){ detail::add( dataMap, "fps", e.what() ); }
-	try{ detail::add( dataMap, "nbFrame", getNbFrames() ); } catch(std::exception& e){ detail::add( dataMap, "nbFrame", e.what() ); }
-	try{ detail::add( dataMap, "ticksPerFrame", getTicksPerFrame() ); } catch(std::exception& e){ detail::add( dataMap, "ticksPerFrame", e.what() ); }
-	try{ detail::add( dataMap, "bitRate", getBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "bitRate", e.what() ); }
-	try{ detail::add( dataMap, "maxBitRate", getMaxBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "maxBitRate", e.what() ); }
-	try{ detail::add( dataMap, "minBitRate", getMinBitRate() ); } catch(std::exception& e){ detail::add( dataMap, "minBitRate", e.what() ); }
-	try{ detail::add( dataMap, "gopSize", getGopSize() ); } catch(std::exception& e){ detail::add( dataMap, "gopSize", e.what() ); }
+	addProperty( dataMap, "streamId", &VideoProperties::getStreamId );
+	addProperty( dataMap, "codecId", &VideoProperties::getCodecId );
+	addProperty( dataMap, "codecName", &VideoProperties::getCodecName );
+	addProperty( dataMap, "codecLongName", &VideoProperties::getCodecLongName );
+	addProperty( dataMap, "profile", &VideoProperties::getProfile );
+	addProperty( dataMap, "profileName", &VideoProperties::getProfileName );
+	addProperty( dataMap, "level", &VideoProperties::getLevel );
+	addProperty( dataMap, "startTimecode", &VideoProperties::getStartTimecodeString );
+	addProperty( dataMap, "width", &VideoProperties::getWidth );
+	addProperty( dataMap, "height", &VideoProperties::getHeight );
+	addProperty( dataMap, "pixelAspectRatio", &VideoProperties::getSar );
+	addProperty( dataMap, "displayAspectRatio", &VideoProperties::getDar );
+	addProperty( dataMap, "dtgActiveFormat", &VideoProperties::getDtgActiveFormat );
+	addProperty( dataMap, "colorTransfert", &VideoProperties::getColorTransfert );
+	addProperty( dataMap, "colorspace", &VideoProperties::getColorspace );
+	addProperty( dataMap, "colorRange", &VideoProperties::getColorRange );
+	addProperty( dataMap, "colorPrimaries", &VideoProperties::getColorPrimaries );
+	addProperty( dataMap, "chromaSampleLocation", &VideoProperties::getChromaSampleLocation );
+	addProperty( dataMap, "interlaced ", &VideoProperties::isInterlaced );
+	addProperty( dataMap, "topFieldFirst", &VideoProperties::isTopFieldFirst );
+	addProperty( dataMap, "fieldOrder", &VideoProperties::getFieldOrder );
+	addProperty( dataMap, "timeBase", &VideoProperties::getTimeBase );
+	addProperty( dataMap, "duration", &VideoProperties::getDuration );
+	addProperty( dataMap, "fps", &VideoProperties::getFps );
+	addProperty( dataMap, "nbFrame", &VideoProperties::getNbFrames );
+	addProperty( dataMap, "ticksPerFrame", &VideoProperties::getTicksPerFrame );
+	addProperty( dataMap, "bitRate", &VideoProperties::getBitRate );
+	addProperty( dataMap, "maxBitRate", &VideoProperties::getMaxBitRate );
+	addProperty( dataMap, "minBitRate", &VideoProperties::getMinBitRate );
+	addProperty( dataMap, "gopSize", &VideoProperties::getGopSize );
 
 	std::string gop;
 	for( size_t frameIndex = 0; frameIndex < _gopStructure.size(); ++frameIndex )
@@ -630,8 +630,8 @@ PropertiesMap VideoProperties::getPropertiesAsMap() const
 	detail::add( dataMap, "gop", gop );
 	//detail::add( dataMap, "isClosedGop", isClosedGop() );
 
-	try{ detail::add( dataMap, "hasBFrames", hasBFrames() ); } catch(std::exception& e){ detail::add( dataMap, "hasBFrames", e.what() ); }
-	try{ detail::add( dataMap, "referencesFrames", getReferencesFrames() ); } catch(std::exception& e){ detail::add( dataMap, "referencesFrames", e.what() ); }
+	addProperty( dataMap, "hasBFrames", &VideoProperties::hasBFrames );
+	addProperty( dataMap, "referencesFrames", &VideoProperties::getReferencesFrames );
 
 	for( size_t metadataIndex = 0; metadataIndex < _metadatas.size(); ++metadataIndex )
 	{
