@@ -81,14 +81,8 @@ private:
 	template<typename T>
 	void addProperty( PropertiesMap& dataMap, const std::string& key, T (FileProperties::*getter)(void) const ) const
 	{
-		try
-		{
-			detail::add( dataMap, key, (this->*getter)() );
-		}
-		catch(std::exception& e)
-		{
-			detail::add( dataMap, key, e.what() );
-		}
+		try { detail::add( dataMap, key, (this->*getter)() ); }
+		catch(std::exception& e) { detail::add( dataMap, key, e.what() ); }
 	}
 #endif
 
