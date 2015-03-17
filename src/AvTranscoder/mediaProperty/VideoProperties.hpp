@@ -47,7 +47,7 @@ public:
 	size_t getStreamIndex() const { return _streamIndex; }
 	size_t getStreamId() const;
 	size_t getCodecId() const;
-	size_t getBitRate() const;  ///< in bits/s
+	size_t getBitRate() const;  ///< in bits/s (0 if not available)
 	size_t getMaxBitRate() const;
 	size_t getMinBitRate() const;
 	size_t getNbFrames() const;
