@@ -15,4 +15,5 @@ sudo wget https://www.ffmpeg.org/releases/ffmpeg-2.2.9.tar.bz2
 sudo bunzip2 ffmpeg-2.2.9.tar.bz2
 sudo tar -xvf ffmpeg-2.2.9.tar
 cd ffmpeg-2.2.9
-./configure --disable-yasm --enable-shared --disable-static && make && sudo make install
+MY_FFMPEG_FLAGS="--disable-yasm --disable-static --enable-shared"
+./configure $MY_FFMPEG_FLAGS && make && sudo make install
