@@ -99,10 +99,11 @@ int ICodec::getLatency()  const
 
 std::vector<Option> ICodec::getOptions()
 {
-	std::vector<Option> optionsArray;
+	OptionArray optionsArray;
 	for( OptionMap::iterator it = _options.begin(); it != _options.end(); ++it )
 	{
-		optionsArray.push_back( it->second );
+		for( size_t optionIndex = 0; optionIndex < it->second.size(); ++optionIndex )
+			optionsArray.push_back( it->second.at( optionIndex ) );
 	}
 	return optionsArray;
 }
