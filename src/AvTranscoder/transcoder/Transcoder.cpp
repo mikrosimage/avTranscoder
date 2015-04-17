@@ -314,6 +314,10 @@ void Transcoder::addTranscodeStream( const std::string& filename, const size_t s
 	// Add input file
 	InputFile* referenceFile = addInputFile( filename, streamIndex );
 
+	// If negative offset, move forward in the input stream
+	if( offset < 0 )
+		referenceFile->seekAtTime( -offset );
+
 	switch( referenceFile->getStream( streamIndex ).getStreamType() )
 	{
 		case AVMEDIA_TYPE_VIDEO:

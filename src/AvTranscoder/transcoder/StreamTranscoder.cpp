@@ -213,7 +213,7 @@ StreamTranscoder::StreamTranscoder(
 			break;
 		}
 	}
-	if( offset )
+	if( offset > 0 )
 		switchToGeneratorDecoder();
 }
 
@@ -383,13 +383,24 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	LOG_DEBUG( "Transcode a frame" )
 
 	// check offset
-	if( _offset )
+	if( _offset > 0 )
 	{
 		bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
 		if( endOfOffset )
 		{
 			// switch to essence from input stream
 			switchToInputDecoder();
+			// reset offset
+			_offset = 0;
+		}
+	}
+	else if( _offset < 0 )
+	{
+		bool endOfStream = _outputStream->getStreamDuration() <= -_offset;
+		if( endOfStream )
+		{
+			// switch to generator
+			switchToGeneratorDecoder();
 			// reset offset
 			_offset = 0;
 		}
@@ -458,6 +469,11 @@ double StreamTranscoder::getDuration() const
 	if( _inputStream )
 	{
 		double totalDuration = _inputStream->getDuration() + _offset;
+		if( totalDuration < 0 )
+		{
+			LOG_WARN( "Offset of " << _offset << "s applied to a stream with a duration of " << _inputStream->getDuration() << "s. Set duration to 0s." ) 
+			return 0.;
+		}
 		return totalDuration;
 	}
 	else
