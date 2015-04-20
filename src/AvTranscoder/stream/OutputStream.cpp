@@ -17,7 +17,8 @@ OutputStream::OutputStream( OutputFile& outputFile, const size_t streamIndex )
 double OutputStream::getStreamDuration() const
 {
 	AVStream& outputStream = _outputFile->getFormatContext().getAVStream( _streamIndex );
-	return av_q2d( outputStream.time_base ) * outputStream.cur_dts;
+	// returns the pts of the last muxed packet converted, from timebase to seconds
+	return av_q2d( outputStream.time_base ) * av_stream_get_end_pts( &outputStream );
 }
 
 IOutputStream::EWrappingStatus OutputStream::wrap( const CodedData& data )
