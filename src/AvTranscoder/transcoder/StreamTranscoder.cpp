@@ -348,6 +348,17 @@ bool StreamTranscoder::processFrame()
 			return processTranscode();
 		}
 	}
+	else if( _offset < 0 )
+	{
+		bool endOfStream = _outputStream->getStreamDuration() >= ( _inputStream->getDuration() + _offset );
+		if( endOfStream )
+		{
+			switchToGeneratorDecoder();
+			// reset offset
+			_offset = 0;
+			return processTranscode( _subStreamIndex );
+		}
+	}
 
 	// REWRAP CASE
 	if( ! _inputDecoder )
@@ -365,6 +376,12 @@ bool StreamTranscoder::processRewrap()
 	assert( _inputDecoder == NULL );
 
 	LOG_DEBUG( "Rewrap a frame" )
+
+	// if switched to generator, process frame
+	if( _currentDecoder == _generator )
+	{
+		return processTranscode();
+	}
 
 	CodedData data;
 	if( ! _inputStream->readNextPacket( data ) )
