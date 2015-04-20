@@ -349,15 +349,12 @@ bool StreamTranscoder::processFrame()
 		}
 	}
 
+	// REWRAP CASE
 	if( ! _inputDecoder )
 	{
 		return processRewrap();
 	}
-
-	if( _subStreamIndex < 0 )
-	{
-		return processTranscode();
-	}
+	// TRANSCODE CASE
 	return processTranscode( _subStreamIndex );	
 }
 
@@ -408,7 +405,7 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	LOG_DEBUG( "Transcode a frame" )
 
 	bool decodingStatus = false;
-	if( subStreamIndex == -1 )
+	if( subStreamIndex < 0 )
 		decodingStatus = _currentDecoder->decodeNextFrame( *_sourceBuffer );
 	else
 		decodingStatus = _currentDecoder->decodeNextFrame( *_sourceBuffer, subStreamIndex );
