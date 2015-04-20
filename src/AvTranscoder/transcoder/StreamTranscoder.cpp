@@ -332,7 +332,7 @@ bool StreamTranscoder::processFrame()
 		bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
 		if( endOfOffset )
 		{
-			LOG_INFO( "End of positive offset for stream " )
+			LOG_INFO( "End of positive offset for stream" )
 
 			// switch to decoder of input stream if it exists
 			if( _inputDecoder )
@@ -355,6 +355,9 @@ bool StreamTranscoder::processFrame()
 		bool endOfStream = _outputStream->getStreamDuration() >= ( _inputStream->getDuration() + _offset );
 		if( endOfStream )
 		{
+			LOG_INFO( "End of negative offset for stream" )
+
+			// switch to generator in any cases
 			switchToGeneratorDecoder();
 			// reset offset
 			_offset = 0;
