@@ -157,7 +157,7 @@ private:
 
 	void addDummyStream( const ProfileLoader::Profile& profile, const ICodec& codec );
 
-	InputFile* addInputFile( const std::string& filename, const size_t streamIndex );
+	InputFile* addInputFile( const std::string& filename, const size_t streamIndex, const double offset );
 
 	ProfileLoader::Profile getProfileFromFile( InputFile& inputFile, const size_t streamIndex );  ///< The function analyses the inputFile
 
