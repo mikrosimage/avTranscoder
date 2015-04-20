@@ -383,6 +383,7 @@ bool StreamTranscoder::processRewrap()
 		return processTranscode();
 	}
 
+	LOG_DEBUG( "read next packet" )
 	CodedData data;
 	if( ! _inputStream->readNextPacket( data ) )
 	{
@@ -394,6 +395,7 @@ bool StreamTranscoder::processRewrap()
 		return false;
 	}
 
+	LOG_DEBUG( "wrap (" << data.getSize() << " bytes)" )
 	IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
 
 	switch( wrappingStatus )
