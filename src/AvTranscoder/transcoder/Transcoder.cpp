@@ -351,7 +351,8 @@ InputFile* Transcoder::addInputFile( const std::string& filename, const size_t s
 	for( std::vector< InputFile* >::iterator it = _inputFiles.begin(); it != _inputFiles.end(); ++it )
 	{
 		if( ( (*it)->getFilename() == filename ) &&
-			! (*it)->getStream( streamIndex ).isActivated() )
+			! (*it)->getStream( streamIndex ).isActivated() &&
+			(*it)->getFormatContext().tellPosition() == 0 )
 		{
 			referenceFile = (*it);
 			LOG_DEBUG( "Get instance of InputFile from '" << filename << "'" )

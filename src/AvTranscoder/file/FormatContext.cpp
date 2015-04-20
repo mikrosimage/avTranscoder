@@ -1,5 +1,9 @@
 #include "FormatContext.hpp"
 
+extern "C" {
+#include <libavformat/avio.h>
+}
+
 #include <stdexcept>
 #include <sstream>
 
@@ -131,6 +135,16 @@ AVStream& FormatContext::addAVStream( const AVCodec& avCodec )
 		throw std::runtime_error( "unable to add new video stream" );
 	}
 	return *stream;
+}
+
+size_t FormatContext::tellPosition() const
+{
+	const long int position = avio_tell( _avFormatContext->pb );
+	if( position < 0 )
+	{
+		throw std::runtime_error( "could not tell position in file: " + getDescriptionFromErrorCode( position ) );
+	}
+	return position;
 }
 
 std::vector<Option> FormatContext::getOptions()
