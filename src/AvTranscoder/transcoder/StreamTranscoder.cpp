@@ -334,9 +334,11 @@ bool StreamTranscoder::processFrame()
 		{
 			LOG_INFO( "End of positive offset for stream " )
 
-			// switch to essence from input stream
+			// switch to decoder of input stream if it exists
 			if( _inputDecoder )
 				switchToInputDecoder();
+			else
+				_currentDecoder = NULL;
 			// reset offset
 			_offset = 0;
 		}
