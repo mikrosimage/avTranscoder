@@ -366,7 +366,7 @@ bool StreamTranscoder::processFrame()
 	}
 
 	// REWRAP CASE
-	if( ! _inputDecoder )
+	if( ! _inputDecoder && _inputStream )
 	{
 		return processRewrap();
 	}
