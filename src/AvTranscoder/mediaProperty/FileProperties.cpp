@@ -18,6 +18,42 @@ FileProperties::FileProperties( const FormatContext& formatContext )
 		detail::fillMetadataDictionnary( _formatContext->metadata, _metadatas );
 }
 
+void FileProperties::addVideoProperties( const VideoProperties& properties )
+{
+	_videoStreams.push_back( properties );
+	_streams.push_back( &_videoStreams.back() );
+}
+
+void FileProperties::addAudioProperties( const AudioProperties& properties )
+{
+	_audioStreams.push_back( properties );
+	_streams.push_back( &_audioStreams.back() );
+}
+
+void FileProperties::addDataProperties( const DataProperties& properties )
+{
+	_dataStreams.push_back( properties );
+	_streams.push_back( &_dataStreams.back() );
+}
+
+void FileProperties::addSubtitleProperties( const SubtitleProperties& properties )
+{
+	_subtitleStreams.push_back( properties );
+	_streams.push_back( &_subtitleStreams.back() );
+}
+
+void FileProperties::addAttachementProperties( const AttachementProperties& properties )
+{
+	_attachementStreams.push_back( properties );
+	_streams.push_back( &_attachementStreams.back() );
+}
+
+void FileProperties::addUnknownProperties( const UnknownProperties& properties )
+{
+	_unknownStreams.push_back( properties );
+	_streams.push_back( &_unknownStreams.back() );
+}
+
 std::string FileProperties::getFilename() const
 {
 	if( ! _formatContext || ! _formatContext->filename )
@@ -160,6 +196,8 @@ PropertyVector FileProperties::getPropertiesAsVector() const
 
 void FileProperties::clearStreamProperties()
 {
+	_streams.clear();
+
 	_videoStreams.clear();
 	_audioStreams.clear();
 	_dataStreams.clear();
