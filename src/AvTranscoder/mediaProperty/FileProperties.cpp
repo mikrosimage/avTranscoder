@@ -110,50 +110,14 @@ size_t FileProperties::getPacketSize() const
 	return _formatContext->packet_size;
 }
 
-VideoProperties& FileProperties::getVideoPropertiesWithStreamIndex( const size_t streamIndex )
+const StreamProperties& FileProperties::getPropertiesWithStreamIndex( const size_t streamIndex ) const
 {
-	for( std::vector< VideoProperties >::iterator it = _videoStreams.begin(); it != _videoStreams.end(); ++it )
+	for( std::vector< StreamProperties* >::const_iterator it = _streams.begin(); it != _streams.end(); ++it )
 	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
+		if( (*it)->getStreamIndex() == streamIndex )
+			return *(*it);
 	}
-	std::string msg( "no video properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-const avtranscoder::VideoProperties& FileProperties::getVideoPropertiesWithStreamIndex( const size_t streamIndex ) const
-{
-	for( std::vector< VideoProperties >::const_iterator it = _videoStreams.begin(); it != _videoStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no video properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-AudioProperties& FileProperties::getAudioPropertiesWithStreamIndex( const size_t streamIndex )
-{
-	for( std::vector< AudioProperties >::iterator it = _audioStreams.begin(); it != _audioStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no audio properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-const avtranscoder::AudioProperties& FileProperties::getAudioPropertiesWithStreamIndex( const size_t streamIndex ) const
-{
-	for( std::vector< AudioProperties >::const_iterator it = _audioStreams.begin(); it != _audioStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no audio properties correspond to stream at index " );
+	std::string msg( "no properties correspond to stream at index " );
 	msg += streamIndex;
 	throw std::runtime_error( msg );
 }

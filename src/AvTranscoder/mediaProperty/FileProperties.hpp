@@ -50,11 +50,8 @@ public:
 	size_t getNbAttachementStreams() const { return _attachementStreams.size(); }
 	size_t getNbUnknownStreams() const { return _unknownStreams.size(); }
 
-	//@{
 	// @brief Get the properties with the indicated stream index
-	avtranscoder::VideoProperties& getVideoPropertiesWithStreamIndex( const size_t streamIndex );
-	avtranscoder::AudioProperties& getAudioPropertiesWithStreamIndex( const size_t streamIndex );
-	//@}
+	const avtranscoder::StreamProperties& getPropertiesWithStreamIndex( const size_t streamIndex ) const;
 
 	//@{
 	// @brief Get the list of properties for a given type (video, audio...)
@@ -69,9 +66,6 @@ public:
 
 #ifndef SWIG
 	const AVFormatContext& getAVFormatContext() { return *_formatContext; }
-
-	const avtranscoder::VideoProperties& getVideoPropertiesWithStreamIndex( const size_t streamIndex ) const;
-	const avtranscoder::AudioProperties& getAudioPropertiesWithStreamIndex( const size_t streamIndex ) const;
 #endif
 
 	PropertyVector getPropertiesAsVector() const;  ///< Return all file properties as a vector (name of property: value)

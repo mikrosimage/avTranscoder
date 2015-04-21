@@ -382,18 +382,20 @@ ProfileLoader::Profile Transcoder::getProfileFromFile( InputFile& inputFile, con
 	NoDisplayProgress progress;
 	inputFile.analyse( progress, eAnalyseLevelHeader );
 
+	const StreamProperties& streamProperties = inputFile.getProperties().getPropertiesWithStreamIndex( streamIndex );
 	const VideoProperties* videoProperties = NULL;
 	const AudioProperties* audioProperties = NULL;
+
 	switch( inputFile.getStream( streamIndex ).getStreamType() )
 	{
 		case AVMEDIA_TYPE_VIDEO:
 		{
-			videoProperties = &inputFile.getProperties().getVideoPropertiesWithStreamIndex( streamIndex );
+			videoProperties = dynamic_cast<const VideoProperties*>( &streamProperties );
 			break;
 		}
 		case AVMEDIA_TYPE_AUDIO:
 		{
-			audioProperties = &inputFile.getProperties().getAudioPropertiesWithStreamIndex( streamIndex );
+			audioProperties = dynamic_cast<const AudioProperties*>( &streamProperties );
 			break;
 		}
 		default:
