@@ -350,7 +350,6 @@ bool StreamTranscoder::processFrame()
 			// process generator
 			if( _currentDecoder != _generator )
 				switchToGeneratorDecoder();
-			return processTranscode();
 		}
 	}
 	else if( _offset < 0 )
@@ -364,7 +363,6 @@ bool StreamTranscoder::processFrame()
 			switchToGeneratorDecoder();
 			// reset offset
 			_offset = 0;
-			return processTranscode( _subStreamIndex );
 		}
 	}
 
