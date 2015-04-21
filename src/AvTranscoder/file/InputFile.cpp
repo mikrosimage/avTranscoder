@@ -143,22 +143,21 @@ bool InputFile::readNextPacket( CodedData& data, const size_t streamIndex )
 
 void InputFile::seekAtFrame( const size_t frame )
 {
-	uint64_t position = frame / getFps() * AV_TIME_BASE;
-	seek( position );
+	seek( frame, AVSEEK_FLAG_FRAME );
 }
 
 void InputFile::seekAtTime( const double time )
 {
 	uint64_t position = time * AV_TIME_BASE;
-	seek( position );
+	seek( position, AVSEEK_FLAG_BACKWARD );
 }
 
-void InputFile::seek( uint64_t position )
+void InputFile::seek( uint64_t position, const int flag )
 {
 	if( (int)_formatContext.getStartTime() != AV_NOPTS_VALUE )
 		position += _formatContext.getStartTime();
 
-	if( av_seek_frame( &_formatContext.getAVFormatContext(), -1, position, AVSEEK_FLAG_BACKWARD ) < 0 )
+	if( av_seek_frame( &_formatContext.getAVFormatContext(), -1, position, flag ) < 0 )
 	{
 		LOG_ERROR( "Error when seek at " << position << " (in AV_TIME_BASE units) in file" )
 	}
