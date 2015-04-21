@@ -13,7 +13,6 @@ av.preloadCodecsAndFormats()
 av.Logger.setLogLevel(av.AV_LOG_QUIET)
 
 
-
 def testTranscodeAudioPositiveOffset():
 	"""
 	Transcode one audio stream (profile wave24b48kmono) with offset at the beginning of the process.

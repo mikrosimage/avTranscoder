@@ -49,8 +49,8 @@ public:
 
 	/**
 	 * @brief Seek input stream at specified frame
-	 * @note clean also buffers in each InputStream
-	 * @return if next packet was read succefully
+	 * @note clean also buffers in each InputStream after seek
+	 * @warning since it seeks to the keyframe, you may not get what you want
 	 **/
 	void seekAtFrame( const size_t frame );
 	void seekAtTime( const double time );
