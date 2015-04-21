@@ -61,6 +61,7 @@ public:
 	void addMetaData( const std::string& key, const std::string& value );
 	AVStream& addAVStream( const AVCodec& avCodec );
 
+	size_t tellPosition() const;
 	size_t getNbStreams() const { return _avFormatContext->nb_streams; }
 	/// Get duration of the program, in seconds
 	size_t getDuration() const { return _avFormatContext->duration; }

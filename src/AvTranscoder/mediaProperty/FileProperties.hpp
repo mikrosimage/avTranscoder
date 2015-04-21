@@ -4,6 +4,7 @@
 #include <AvTranscoder/common.hpp>
 #include <AvTranscoder/mediaProperty/util.hpp>
 #include <AvTranscoder/file/FormatContext.hpp>
+#include <AvTranscoder/mediaProperty/StreamProperties.hpp>
 #include <AvTranscoder/mediaProperty/VideoProperties.hpp>
 #include <AvTranscoder/mediaProperty/AudioProperties.hpp>
 #include <AvTranscoder/mediaProperty/DataProperties.hpp>
@@ -26,6 +27,17 @@ public:
 	std::string getFormatName() const;  ///< A comma separated list of short names for the format
 	std::string getFormatLongName() const;
 
+	//@{
+	// @brief Manage list of properties depending on the type (video, audio...)
+	void addVideoProperties( const VideoProperties& properties );
+	void addAudioProperties( const AudioProperties& properties );
+	void addDataProperties( const DataProperties& properties );
+	void addSubtitleProperties( const SubtitleProperties& properties );
+	void addAttachementProperties( const AttachementProperties& properties );
+	void addUnknownProperties( const UnknownProperties& properties );
+	void clearStreamProperties();  ///< Clear all array of stream properties
+	//@}
+
 	size_t getProgramsCount() const;
 	double getStartTime() const;
 	double getDuration() const;  ///< in seconds
@@ -42,39 +54,25 @@ public:
 	size_t getNbAttachementStreams() const { return _attachementStreams.size(); }
 	size_t getNbUnknownStreams() const { return _unknownStreams.size(); }
 
-	//@{
 	// @brief Get the properties with the indicated stream index
-	avtranscoder::VideoProperties& getVideoPropertiesWithStreamIndex( const size_t streamIndex );
-	avtranscoder::AudioProperties& getAudioPropertiesWithStreamIndex( const size_t streamIndex );
-	//@}
+	const avtranscoder::StreamProperties& getPropertiesWithStreamIndex( const size_t streamIndex ) const;
 
 	//@{
 	// @brief Get the list of properties for a given type (video, audio...)
-	std::vector< avtranscoder::VideoProperties >& getVideoProperties() { return  _videoStreams; }
-	std::vector< avtranscoder::AudioProperties >& getAudioProperties() { return  _audioStreams; }
-	std::vector< avtranscoder::DataProperties >& getDataProperties() { return  _dataStreams; }
-	std::vector< avtranscoder::SubtitleProperties >& getSubtitleProperties() { return  _subtitleStreams; }
-	std::vector< avtranscoder::AttachementProperties >& getAttachementProperties() { return  _attachementStreams; }
-	std::vector< avtranscoder::UnknownProperties >& getUnknownPropertiesProperties() { return  _unknownStreams; }
-	//@}
-
-#ifndef SWIG
-	const AVFormatContext& getAVFormatContext() { return *_formatContext; }
-
-	const avtranscoder::VideoProperties& getVideoPropertiesWithStreamIndex( const size_t streamIndex ) const;
-	const avtranscoder::AudioProperties& getAudioPropertiesWithStreamIndex( const size_t streamIndex ) const;
-
+	const std::vector< avtranscoder::StreamProperties* >& getStreamProperties() const  { return  _streams; }
 	const std::vector< avtranscoder::VideoProperties >& getVideoProperties() const  { return  _videoStreams; }
 	const std::vector< avtranscoder::AudioProperties >& getAudioProperties() const  { return  _audioStreams; }
 	const std::vector< avtranscoder::DataProperties >& getDataProperties() const  { return  _dataStreams; }
 	const std::vector< avtranscoder::SubtitleProperties >& getSubtitleProperties() const  { return  _subtitleStreams; }
 	const std::vector< avtranscoder::AttachementProperties >& getAttachementProperties() const  { return  _attachementStreams; }
 	const std::vector< avtranscoder::UnknownProperties >& getUnknownPropertiesProperties() const  { return  _unknownStreams; }
+	//@}
+
+#ifndef SWIG
+	const AVFormatContext& getAVFormatContext() { return *_formatContext; }
 #endif
 
 	PropertyVector getPropertiesAsVector() const;  ///< Return all file properties as a vector (name of property: value)
-
-	void clearStreamProperties();  ///< Clear all array of stream properties
 
 private:
 #ifndef SWIG
@@ -95,6 +93,7 @@ private:
 private:
 	const AVFormatContext* _formatContext;  ///< Has link (no ownership)
 
+	std::vector< StreamProperties* > _streams;  ///< Array of properties per stream (of all types) - only references to the following properties
 	std::vector< VideoProperties > _videoStreams;  ///< Array of properties per video stream
 	std::vector< AudioProperties >  _audioStreams;  ///< Array of properties per audio stream
 	std::vector< DataProperties > _dataStreams;  ///< Array of properties per data stream

@@ -49,8 +49,8 @@ public:
 
 	/**
 	 * @brief Seek input stream at specified frame
-	 * @note clean also buffers in each InputStream
-	 * @return if next packet was read succefully
+	 * @note clean also buffers in each InputStream after seek
+	 * @warning since it seeks to the keyframe, you may not get what you want
 	 **/
 	void seekAtFrame( const size_t frame );
 	void seekAtTime( const double time );
@@ -105,11 +105,12 @@ private:
 	double getFps();
 
 	/**
-	 * @brief Seek at a specific position (in AV_TIME_BASE units)
+	 * @brief Seek at a specific position
+	 * @param position: can be in AV_TIME_BASE units, in frames... depending on the flag value
+	 * @param flag: seeking mode (AVSEEK_FLAG_xxx)
 	 * @note before seek, add offset of start time
-	 * @note after seek, clear buffering of streams
 	 */
-	void seek( uint64_t position );
+	void seek( uint64_t position, const int flag );
 
 protected:
 	FormatContext _formatContext;

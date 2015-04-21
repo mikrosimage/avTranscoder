@@ -18,6 +18,54 @@ FileProperties::FileProperties( const FormatContext& formatContext )
 		detail::fillMetadataDictionnary( _formatContext->metadata, _metadatas );
 }
 
+void FileProperties::addVideoProperties( const VideoProperties& properties )
+{
+	_videoStreams.push_back( properties );
+	_streams.push_back( &_videoStreams.back() );
+}
+
+void FileProperties::addAudioProperties( const AudioProperties& properties )
+{
+	_audioStreams.push_back( properties );
+	_streams.push_back( &_audioStreams.back() );
+}
+
+void FileProperties::addDataProperties( const DataProperties& properties )
+{
+	_dataStreams.push_back( properties );
+	_streams.push_back( &_dataStreams.back() );
+}
+
+void FileProperties::addSubtitleProperties( const SubtitleProperties& properties )
+{
+	_subtitleStreams.push_back( properties );
+	_streams.push_back( &_subtitleStreams.back() );
+}
+
+void FileProperties::addAttachementProperties( const AttachementProperties& properties )
+{
+	_attachementStreams.push_back( properties );
+	_streams.push_back( &_attachementStreams.back() );
+}
+
+void FileProperties::addUnknownProperties( const UnknownProperties& properties )
+{
+	_unknownStreams.push_back( properties );
+	_streams.push_back( &_unknownStreams.back() );
+}
+
+void FileProperties::clearStreamProperties()
+{
+	_streams.clear();
+
+	_videoStreams.clear();
+	_audioStreams.clear();
+	_dataStreams.clear();
+	_subtitleStreams.clear();
+	_attachementStreams.clear();
+	_unknownStreams.clear();
+}
+
 std::string FileProperties::getFilename() const
 {
 	if( ! _formatContext || ! _formatContext->filename )
@@ -74,50 +122,14 @@ size_t FileProperties::getPacketSize() const
 	return _formatContext->packet_size;
 }
 
-VideoProperties& FileProperties::getVideoPropertiesWithStreamIndex( const size_t streamIndex )
+const StreamProperties& FileProperties::getPropertiesWithStreamIndex( const size_t streamIndex ) const
 {
-	for( std::vector< VideoProperties >::iterator it = _videoStreams.begin(); it != _videoStreams.end(); ++it )
+	for( std::vector< StreamProperties* >::const_iterator it = _streams.begin(); it != _streams.end(); ++it )
 	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
+		if( (*it)->getStreamIndex() == streamIndex )
+			return *(*it);
 	}
-	std::string msg( "no video properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-const avtranscoder::VideoProperties& FileProperties::getVideoPropertiesWithStreamIndex( const size_t streamIndex ) const
-{
-	for( std::vector< VideoProperties >::const_iterator it = _videoStreams.begin(); it != _videoStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no video properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-AudioProperties& FileProperties::getAudioPropertiesWithStreamIndex( const size_t streamIndex )
-{
-	for( std::vector< AudioProperties >::iterator it = _audioStreams.begin(); it != _audioStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no audio properties correspond to stream at index " );
-	msg += streamIndex;
-	throw std::runtime_error( msg );
-}
-
-const avtranscoder::AudioProperties& FileProperties::getAudioPropertiesWithStreamIndex( const size_t streamIndex ) const
-{
-	for( std::vector< AudioProperties >::const_iterator it = _audioStreams.begin(); it != _audioStreams.end(); ++it )
-	{
-		if( it->getStreamIndex() == streamIndex )
-			return *it;
-	}
-	std::string msg( "no audio properties correspond to stream at index " );
+	std::string msg( "no properties correspond to stream at index " );
 	msg += streamIndex;
 	throw std::runtime_error( msg );
 }
@@ -156,16 +168,6 @@ PropertyVector FileProperties::getPropertiesAsVector() const
 	}
 
 	return data;
-}
-
-void FileProperties::clearStreamProperties()
-{
-	_videoStreams.clear();
-	_audioStreams.clear();
-	_dataStreams.clear();
-	_subtitleStreams.clear();
-	_attachementStreams.clear();
-	_unknownStreams.clear();
 }
 
 }

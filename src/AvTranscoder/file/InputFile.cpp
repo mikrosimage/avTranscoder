@@ -61,38 +61,38 @@ void InputFile::analyse( IProgress& progress, const EAnalyseLevel level )
 		{
 			case AVMEDIA_TYPE_VIDEO:
 			{
-				VideoProperties properties( _formatContext, streamIndex, progress, level );
-				_properties.getVideoProperties().push_back( properties );
+				const VideoProperties properties( _formatContext, streamIndex, progress, level );
+				_properties.addVideoProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_AUDIO:
 			{
-				AudioProperties properties( _formatContext, streamIndex );
-				_properties.getAudioProperties().push_back( properties );
+				const AudioProperties properties( _formatContext, streamIndex );
+				_properties.addAudioProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_DATA:
 			{
-				DataProperties properties( _formatContext, streamIndex );
-				_properties.getDataProperties().push_back( properties );
+				const DataProperties properties( _formatContext, streamIndex );
+				_properties.addDataProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_SUBTITLE:
 			{
-				SubtitleProperties properties( _formatContext, streamIndex );
-				_properties.getSubtitleProperties().push_back( properties );
+				const SubtitleProperties properties( _formatContext, streamIndex );
+				_properties.addSubtitleProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_ATTACHMENT:
 			{
-				AttachementProperties properties( _formatContext, streamIndex );
-				_properties.getAttachementProperties().push_back( properties );
+				const AttachementProperties properties( _formatContext, streamIndex );
+				_properties.addAttachementProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_UNKNOWN:
 			{
-				UnknownProperties properties( _formatContext, streamIndex );
-				_properties.getUnknownPropertiesProperties().push_back( properties );
+				const UnknownProperties properties( _formatContext, streamIndex );
+				_properties.addUnknownProperties( properties );
 				break;
 			}
 			case AVMEDIA_TYPE_NB:
@@ -143,22 +143,21 @@ bool InputFile::readNextPacket( CodedData& data, const size_t streamIndex )
 
 void InputFile::seekAtFrame( const size_t frame )
 {
-	uint64_t position = frame / getFps() * AV_TIME_BASE;
-	seek( position );
+	seek( frame, AVSEEK_FLAG_FRAME );
 }
 
 void InputFile::seekAtTime( const double time )
 {
 	uint64_t position = time * AV_TIME_BASE;
-	seek( position );
+	seek( position, AVSEEK_FLAG_BACKWARD );
 }
 
-void InputFile::seek( uint64_t position )
+void InputFile::seek( uint64_t position, const int flag )
 {
 	if( (int)_formatContext.getStartTime() != AV_NOPTS_VALUE )
 		position += _formatContext.getStartTime();
 
-	if( av_seek_frame( &_formatContext.getAVFormatContext(), -1, position, AVSEEK_FLAG_BACKWARD ) < 0 )
+	if( av_seek_frame( &_formatContext.getAVFormatContext(), -1, position, flag ) < 0 )
 	{
 		LOG_ERROR( "Error when seek at " << position << " (in AV_TIME_BASE units) in file" )
 	}

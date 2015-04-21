@@ -22,7 +22,8 @@ namespace avtranscoder
 
 StreamTranscoder::StreamTranscoder(
 		IInputStream& inputStream,
-		IOutputFile& outputFile
+		IOutputFile& outputFile,
+		const double offset
 	)
 	: _inputStream( &inputStream )
 	, _outputStream( NULL )
@@ -34,7 +35,7 @@ StreamTranscoder::StreamTranscoder(
 	, _outputEncoder( NULL )
 	, _transform( NULL )
 	, _subStreamIndex( -1 )
-	, _offset( 0 )
+	, _offset( offset )
 	, _canSwitchToGenerator( false )
 {
 	// create a re-wrapping case
@@ -213,8 +214,6 @@ StreamTranscoder::StreamTranscoder(
 			break;
 		}
 	}
-	if( offset )
-		switchToGeneratorDecoder();
 }
 
 StreamTranscoder::StreamTranscoder(
@@ -241,7 +240,8 @@ StreamTranscoder::StreamTranscoder(
 		VideoGenerator* generatorVideo = new VideoGenerator();
 		const VideoCodec& inputVideoCodec = static_cast<const VideoCodec&>( inputCodec );
 		generatorVideo->setVideoFrameDesc( inputVideoCodec.getVideoFrameDesc() );
-		_currentDecoder = generatorVideo;
+		_generator = generatorVideo;
+		_currentDecoder = _generator;
 
 		// buffers to process
 		VideoFrameDesc inputFrameDesc = inputVideoCodec.getVideoFrameDesc();
@@ -267,7 +267,8 @@ StreamTranscoder::StreamTranscoder(
 		AudioGenerator* generatorAudio = new AudioGenerator();
 		const AudioCodec& inputAudioCodec = static_cast<const AudioCodec&>( inputCodec );
 		generatorAudio->setAudioFrameDesc( inputAudioCodec.getAudioFrameDesc() );
-		_currentDecoder = generatorAudio;
+		_generator = generatorAudio;
+		_currentDecoder = _generator;
 
 		// buffers to process
 		AudioFrameDesc inputFrameDesc = inputAudioCodec.getAudioFrameDesc();
@@ -305,10 +306,6 @@ StreamTranscoder::~StreamTranscoder()
 
 void StreamTranscoder::preProcessCodecLatency()
 {
-	// rewrap case: no need to take care of the latency of codec
-	if( ! _currentDecoder )
-		return;
-
 	int latency = _outputEncoder->getCodec().getLatency();
 
 	LOG_DEBUG( "Latency of stream: " << latency )
@@ -317,23 +314,64 @@ void StreamTranscoder::preProcessCodecLatency()
 		latency < _outputEncoder->getCodec().getAVCodecContext().frame_number )
 		return;
 
+	// need a decoder to pre-process frames
+	if( ! _currentDecoder )
+		switchToGeneratorDecoder();
+
 	while( ( latency-- ) > 0 )
 	{
 		processFrame();
 	}
+
+	if( isRewrapCase() )
+		_currentDecoder = NULL;  // no current decoder after pre-process
 }
 
 bool StreamTranscoder::processFrame()
 {
-	if( ! _currentDecoder )
+	// Manage offset
+	if( _offset > 0 )
+	{
+		bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
+		if( endOfOffset )
+		{
+			LOG_INFO( "End of positive offset for stream" )
+
+			// switch to decoder of input stream if it exists
+			if( _inputDecoder )
+				switchToInputDecoder();
+			else
+				_currentDecoder = NULL;
+			// reset offset
+			_offset = 0;
+		}
+		else
+		{
+			// process generator
+			if( _currentDecoder != _generator )
+				switchToGeneratorDecoder();
+		}
+	}
+	else if( _offset < 0 )
+	{
+		bool endOfStream = _outputStream->getStreamDuration() >= ( _inputStream->getDuration() + _offset );
+		if( endOfStream )
+		{
+			LOG_INFO( "End of negative offset for stream" )
+
+			// switch to generator in any cases
+			switchToGeneratorDecoder();
+			// reset offset
+			_offset = 0;
+		}
+	}
+
+	// REWRAP CASE
+	if( isRewrapCase() )
 	{
 		return processRewrap();
 	}
-
-	if( _subStreamIndex < 0 )
-	{
-		return processTranscode();
-	}
+	// TRANSCODE CASE
 	return processTranscode( _subStreamIndex );	
 }
 
@@ -341,9 +379,17 @@ bool StreamTranscoder::processRewrap()
 {
 	assert( _inputStream  != NULL );
 	assert( _outputStream != NULL );
-	
+	assert( _inputDecoder == NULL );
+
 	LOG_DEBUG( "Rewrap a frame" )
 
+	// if switched to generator, process frame
+	if( _currentDecoder == _generator )
+	{
+		return processTranscode();
+	}
+
+	LOG_DEBUG( "read next packet" )
 	CodedData data;
 	if( ! _inputStream->readNextPacket( data ) )
 	{
@@ -355,6 +401,7 @@ bool StreamTranscoder::processRewrap()
 		return false;
 	}
 
+	LOG_DEBUG( "wrap (" << data.getSize() << " bytes)" )
 	IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
 
 	switch( wrappingStatus )
@@ -382,21 +429,8 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 
 	LOG_DEBUG( "Transcode a frame" )
 
-	// check offset
-	if( _offset )
-	{
-		bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
-		if( endOfOffset )
-		{
-			// switch to essence from input stream
-			switchToInputDecoder();
-			// reset offset
-			_offset = 0;
-		}
-	}
-
 	bool decodingStatus = false;
-	if( subStreamIndex == -1 )
+	if( subStreamIndex < 0 )
 		decodingStatus = _currentDecoder->decodeNextFrame( *_sourceBuffer );
 	else
 		decodingStatus = _currentDecoder->decodeNextFrame( *_sourceBuffer, subStreamIndex );
@@ -441,14 +475,23 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	return true;
 }
 
+bool StreamTranscoder::isRewrapCase() const
+{
+	return _inputStream && ! _inputDecoder;
+}
+
 void StreamTranscoder::switchToGeneratorDecoder()
 {
+	LOG_INFO( "Switch to generator decoder" )
+
 	_currentDecoder = _generator;
 	assert( _currentDecoder != NULL );
 }
 
 void StreamTranscoder::switchToInputDecoder()
 {
+	LOG_INFO( "Switch to input decoder" )
+
 	_currentDecoder = _inputDecoder;
 	assert( _currentDecoder != NULL );
 }
@@ -458,6 +501,11 @@ double StreamTranscoder::getDuration() const
 	if( _inputStream )
 	{
 		double totalDuration = _inputStream->getDuration() + _offset;
+		if( totalDuration < 0 )
+		{
+			LOG_WARN( "Offset of " << _offset << "s applied to a stream with a duration of " << _inputStream->getDuration() << "s. Set duration to 0s." ) 
+			return 0.;
+		}
 		return totalDuration;
 	}
 	else
