@@ -306,10 +306,6 @@ StreamTranscoder::~StreamTranscoder()
 
 void StreamTranscoder::preProcessCodecLatency()
 {
-	// rewrap case: no need to take care of the latency of codec
-	if( ! _currentDecoder )
-		return;
-
 	int latency = _outputEncoder->getCodec().getLatency();
 
 	LOG_DEBUG( "Latency of stream: " << latency )
@@ -318,10 +314,17 @@ void StreamTranscoder::preProcessCodecLatency()
 		latency < _outputEncoder->getCodec().getAVCodecContext().frame_number )
 		return;
 
+	// need a decoder to pre-process frames
+	if( ! _currentDecoder )
+		switchToGeneratorDecoder();
+
 	while( ( latency-- ) > 0 )
 	{
 		processFrame();
 	}
+
+	if( isRewrapCase() )
+		_currentDecoder = NULL;  // no current decoder after pre-process
 }
 
 bool StreamTranscoder::processFrame()
@@ -366,7 +369,7 @@ bool StreamTranscoder::processFrame()
 	}
 
 	// REWRAP CASE
-	if( ! _inputDecoder && _inputStream )
+	if( isRewrapCase() )
 	{
 		return processRewrap();
 	}
@@ -472,6 +475,11 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	}
 
 	return true;
+}
+
+bool StreamTranscoder::isRewrapCase() const
+{
+	return _inputStream && ! _inputDecoder;
 }
 
 void StreamTranscoder::switchToGeneratorDecoder()

@@ -94,6 +94,8 @@ private:
 	bool processRewrap();
 	bool processTranscode( const int subStreamIndex = -1 );  ///< By default transcode all channels
 
+	bool isRewrapCase() const;
+
 private:
 	IInputStream* _inputStream;  ///< Input stream to read next packet (has link, no ownership)
 	IOutputStream* _outputStream;  ///< Output stream to wrap next packet (has link, no ownership)
