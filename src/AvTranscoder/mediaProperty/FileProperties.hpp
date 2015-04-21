@@ -27,12 +27,16 @@ public:
 	std::string getFormatName() const;  ///< A comma separated list of short names for the format
 	std::string getFormatLongName() const;
 
+	//@{
+	// @brief Manage list of properties depending on the type (video, audio...)
 	void addVideoProperties( const VideoProperties& properties );
 	void addAudioProperties( const AudioProperties& properties );
 	void addDataProperties( const DataProperties& properties );
 	void addSubtitleProperties( const SubtitleProperties& properties );
 	void addAttachementProperties( const AttachementProperties& properties );
 	void addUnknownProperties( const UnknownProperties& properties );
+	void clearStreamProperties();  ///< Clear all array of stream properties
+	//@}
 
 	size_t getProgramsCount() const;
 	double getStartTime() const;
@@ -69,8 +73,6 @@ public:
 #endif
 
 	PropertyVector getPropertiesAsVector() const;  ///< Return all file properties as a vector (name of property: value)
-
-	void clearStreamProperties();  ///< Clear all array of stream properties
 
 private:
 #ifndef SWIG

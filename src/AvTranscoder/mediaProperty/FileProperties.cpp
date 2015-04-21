@@ -54,6 +54,18 @@ void FileProperties::addUnknownProperties( const UnknownProperties& properties )
 	_streams.push_back( &_unknownStreams.back() );
 }
 
+void FileProperties::clearStreamProperties()
+{
+	_streams.clear();
+
+	_videoStreams.clear();
+	_audioStreams.clear();
+	_dataStreams.clear();
+	_subtitleStreams.clear();
+	_attachementStreams.clear();
+	_unknownStreams.clear();
+}
+
 std::string FileProperties::getFilename() const
 {
 	if( ! _formatContext || ! _formatContext->filename )
@@ -156,18 +168,6 @@ PropertyVector FileProperties::getPropertiesAsVector() const
 	}
 
 	return data;
-}
-
-void FileProperties::clearStreamProperties()
-{
-	_streams.clear();
-
-	_videoStreams.clear();
-	_audioStreams.clear();
-	_dataStreams.clear();
-	_subtitleStreams.clear();
-	_attachementStreams.clear();
-	_unknownStreams.clear();
 }
 
 }
