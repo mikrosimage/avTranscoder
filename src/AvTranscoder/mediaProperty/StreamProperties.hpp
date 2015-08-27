@@ -17,6 +17,7 @@ public:
 
 	size_t getStreamIndex() const { return _streamIndex; }
 	size_t getStreamId() const;
+	AVMediaType getStreamType() const;
 	Rational getTimeBase() const;
 	float getDuration() const;  ///< in seconds
 	const PropertyVector& getMetadatas() const { return _metadatas; }

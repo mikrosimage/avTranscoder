@@ -25,6 +25,13 @@ size_t StreamProperties::getStreamId() const
 	return _formatContext->streams[_streamIndex]->id;
 }
 
+AVMediaType StreamProperties::getStreamType() const
+{
+	if( ! _formatContext )
+		throw std::runtime_error( "unknown format context" );
+	return _formatContext->streams[_streamIndex]->codec->codec_type;
+}
+
 Rational StreamProperties::getTimeBase() const
 {
 	if( ! _formatContext )
