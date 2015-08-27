@@ -171,14 +171,6 @@ std::string InputFile::getFormatMimeType() const
 #endif
 }
 
-double InputFile::getFps()
-{
-	double fps = 1;
-	if( _properties.getNbVideoStreams() )
-		fps = _properties.getVideoProperties().at( 0 ).getFps();
-	return fps;
-}
-
 void InputFile::setupUnwrapping( const ProfileLoader::Profile& profile )
 {
 	LOG_DEBUG( "Set profile of input file with:\n" << profile )

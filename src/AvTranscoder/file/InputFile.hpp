@@ -59,7 +59,7 @@ public:
 
 	/** 
 	 * @brief Activate the indicated stream
-         * @note Activate a stream results in buffered its data when processing
+	 * @note Activate a stream results in buffered its data when processing
 	 **/
 	void activateStream( const size_t streamIndex, const bool activate = true );
 
@@ -110,13 +110,6 @@ public:
 	 * @return structure of media metadatas
 	 **/
 	static FileProperties analyseFile( const std::string& filename, IProgress& progress, const EAnalyseLevel level = eAnalyseLevelFirstGop );
-
-private:
-	/**
-	 * @brief Get Fps from first video stream
-	 * @note if there is no video stream, return 1.
-	 */
-	double getFps();
 
 protected:
 	FormatContext _formatContext;
