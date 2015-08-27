@@ -142,7 +142,7 @@ AVStream& FormatContext::addAVStream( const AVCodec& avCodec )
 	return *stream;
 }
 
-void FormatContext::seek( uint64_t position, const int flag )
+void FormatContext::seek( uint64_t position, const int flag, const int streamIndex )
 {
 	if( (int)getStartTime() != AV_NOPTS_VALUE )
 	{

@@ -83,16 +83,35 @@ bool InputFile::readNextPacket( CodedData& data, const size_t streamIndex )
 	return true;
 }
 
-void InputFile::seekAtFrame( const size_t frame, const int flag )
+void InputFile::seekAtFrame( const size_t frame, const int flag, const int streamIndex )
 {
-	uint64_t position = frame / getFps() * AV_TIME_BASE;
-	_formatContext.seek( position, flag );
+	// get time base
+	uint64_t timeBase = 0;
+	double fps = 1;
+	if( streamIndex == -1 )
+	{
+		// file time base
+		timeBase = AV_TIME_BASE;
+	}
+	else
+	{
+		// stream time base
+		const AVRational streamTimeScale = _formatContext.getAVStream(streamIndex).time_base;
+		timeBase = streamTimeScale.den / streamTimeScale.num;
+
+		const StreamProperties& streamProperties = _properties.getStreamPropertiesWithIndex( streamIndex );
+		if( streamProperties.getStreamType() == AVMEDIA_TYPE_VIDEO )
+			fps = dynamic_cast<const VideoProperties&>( streamProperties ).getFps();
+	}
+	// seek at position
+	const uint64_t position = frame / fps * timeBase;
+	return _formatContext.seek( position, flag, streamIndex );
 }
 
-void InputFile::seekAtTime( const double time, const int flag )
+void InputFile::seekAtTime( const double time, const int flag, const int streamIndex )
 {
-	uint64_t position = time * AV_TIME_BASE;
-	_formatContext.seek( position, flag );
+	const uint64_t position = time * AV_TIME_BASE;
+	return _formatContext.seek( position, flag, streamIndex );
 }
 
 void InputFile::activateStream( const size_t streamIndex, bool activate )

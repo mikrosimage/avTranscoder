@@ -51,10 +51,11 @@ public:
 	 * @brief Seek at a specific frame / time (in seconds)
 	 * @note Seek in file by using the default stream (according to ffmpeg)
 	 * @param flag: ffmpeg seek flag (by default seek to any frame, even non-keyframes)
+	 * @param streamIndex: if -1, a default stream is selected
 	 * @warning If the seek is done to a non key-frame, the decoding will start from the next key-frame
 	 **/
-	void seekAtFrame( const size_t frame, const int flag = AVSEEK_FLAG_ANY );
-	void seekAtTime( const double time, const int flag = AVSEEK_FLAG_ANY );
+	void seekAtFrame( const size_t frame, const int flag = AVSEEK_FLAG_ANY, const int streamIndex = -1 );
+	void seekAtTime( const double time, const int flag = AVSEEK_FLAG_ANY, const int streamIndex = -1 );
 
 	/** 
 	 * @brief Activate the indicated stream
