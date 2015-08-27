@@ -77,9 +77,10 @@ public:
 	 * @brief Seek at a specific position
 	 * @param position: can be in AV_TIME_BASE units, in frames... depending on the flag value
 	 * @param flag: seeking mode (AVSEEK_FLAG_xxx)
+	 * @param streamIndex: if -1, a default stream is selected, and timestamp is automatically converted from AV_TIME_BASE units to the stream specific time_base.
 	 * @note before seek, add offset of start time
 	 */
-	void seek( uint64_t position, const int flag );
+	void seek( uint64_t position, const int flag, const int streamIndex );
 
 	size_t getNbStreams() const { return _avFormatContext->nb_streams; }
 	/// Get duration of the program, in seconds

@@ -51,14 +51,15 @@ public:
 	 * @brief Seek at a specific frame / time (in seconds)
 	 * @note Seek in file by using the default stream (according to ffmpeg)
 	 * @param flag: ffmpeg seek flag (by default seek to any frame, even non-keyframes)
+	 * @param streamIndex: if -1, a default stream is selected
 	 * @warning If the seek is done to a non key-frame, the decoding will start from the next key-frame
 	 **/
-	void seekAtFrame( const size_t frame, const int flag = AVSEEK_FLAG_ANY );
-	void seekAtTime( const double time, const int flag = AVSEEK_FLAG_ANY );
+	void seekAtFrame( const size_t frame, const int flag = AVSEEK_FLAG_ANY, const int streamIndex = -1 );
+	void seekAtTime( const double time, const int flag = AVSEEK_FLAG_ANY, const int streamIndex = -1 );
 
 	/** 
 	 * @brief Activate the indicated stream
-         * @note Activate a stream results in buffered its data when processing
+	 * @note Activate a stream results in buffered its data when processing
 	 **/
 	void activateStream( const size_t streamIndex, const bool activate = true );
 
@@ -109,13 +110,6 @@ public:
 	 * @return structure of media metadatas
 	 **/
 	static FileProperties analyseFile( const std::string& filename, IProgress& progress, const EAnalyseLevel level = eAnalyseLevelFirstGop );
-
-private:
-	/**
-	 * @brief Get Fps from first video stream
-	 * @note if there is no video stream, return 1.
-	 */
-	double getFps();
 
 protected:
 	FormatContext _formatContext;

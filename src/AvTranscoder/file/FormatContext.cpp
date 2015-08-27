@@ -142,10 +142,15 @@ AVStream& FormatContext::addAVStream( const AVCodec& avCodec )
 	return *stream;
 }
 
-void FormatContext::seek( uint64_t position, const int flag )
+void FormatContext::seek( uint64_t position, const int flag, const int streamIndex )
 {
 	if( (int)getStartTime() != AV_NOPTS_VALUE )
+	{
+		LOG_DEBUG( "Add a start time of " << getStartTime() << " to position to seek" )
 		position += getStartTime();
+	}
+
+	LOG_INFO( "Seek at " << position << " in stream " << streamIndex )
 
 	if( av_seek_frame( _avFormatContext, -1, position, flag ) < 0 )
 	{
