@@ -314,6 +314,9 @@ StreamTranscoder::~StreamTranscoder()
 
 void StreamTranscoder::preProcessCodecLatency()
 {
+	if( _outputEncoder == NULL )
+		return;
+
 	int latency = _outputEncoder->getCodec().getLatency();
 
 	LOG_DEBUG( "Latency of stream: " << latency )
