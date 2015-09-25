@@ -43,6 +43,9 @@ StreamTranscoder::StreamTranscoder(
 	{
 		case AVMEDIA_TYPE_VIDEO :
 		{
+			// output stream
+			_outputStream = &outputFile.addVideoStream( _inputStream->getVideoCodec() );
+
 			VideoFrameDesc inputFrameDesc( _inputStream->getVideoCodec().getVideoFrameDesc() );
 
 			// generator decoder
@@ -58,17 +61,24 @@ StreamTranscoder::StreamTranscoder(
 			_transform = new VideoTransform();
 
 			// output encoder
-			VideoEncoder* outputVideo = new VideoEncoder( _inputStream->getVideoCodec().getCodecName() );
-			outputVideo->setupVideoEncoder( inputFrameDesc );
-			_outputEncoder = outputVideo;
-
-			// output stream
-			_outputStream = &outputFile.addVideoStream( _inputStream->getVideoCodec() );
+			try
+			{
+				VideoEncoder* outputVideo = new VideoEncoder( _inputStream->getVideoCodec().getCodecName() );
+				outputVideo->setupVideoEncoder( inputFrameDesc );
+				_outputEncoder = outputVideo;
+			}
+			catch( std::runtime_error& e )
+			{
+				LOG_ERROR( "Cannot create the video encoder for stream " << _inputStream->getStreamIndex() << " if needed. " << e.what() )
+			}
 
 			break;
 		}
 		case AVMEDIA_TYPE_AUDIO :
 		{
+			// output stream
+			_outputStream = &outputFile.addAudioStream( _inputStream->getAudioCodec() );
+
 			AudioFrameDesc inputFrameDesc( _inputStream->getAudioCodec().getAudioFrameDesc() );
 
 			// generator decoder
@@ -84,12 +94,16 @@ StreamTranscoder::StreamTranscoder(
 			_transform = new AudioTransform();
 
 			// output encoder
-			AudioEncoder* outputAudio = new AudioEncoder( _inputStream->getAudioCodec().getCodecName()  );
-			outputAudio->setupAudioEncoder( inputFrameDesc );
-			_outputEncoder = outputAudio;
-
-			// output stream
-			_outputStream = &outputFile.addAudioStream( _inputStream->getAudioCodec() );
+			try
+			{
+				AudioEncoder* outputAudio = new AudioEncoder( _inputStream->getAudioCodec().getCodecName()  );
+				outputAudio->setupAudioEncoder( inputFrameDesc );
+				_outputEncoder = outputAudio;
+			}
+			catch( std::runtime_error& e )
+			{
+				LOG_ERROR( "Cannot create the audio encoder for stream " << _inputStream->getStreamIndex() << " if needed. " << e.what() )
+			}
 
 			break;
 		}
