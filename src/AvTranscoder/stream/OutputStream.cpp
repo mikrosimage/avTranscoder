@@ -16,7 +16,7 @@ OutputStream::OutputStream( OutputFile& outputFile, const size_t streamIndex )
 
 float OutputStream::getStreamDuration() const
 {
-	AVStream& outputStream = _outputFile->getFormatContext().getAVStream( _streamIndex );
+	const AVStream& outputStream = _outputFile->getFormatContext().getAVStream( _streamIndex );
 #if AVTRANSCODER_FFMPEG_DEPENDENCY && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(55, 40, 100)
 	// returns the pts of the last muxed packet, converted from timebase to seconds
 	return av_q2d( outputStream.time_base ) * av_stream_get_end_pts( &outputStream );
@@ -27,7 +27,7 @@ float OutputStream::getStreamDuration() const
 
 size_t OutputStream::getNbFrames() const
 {
-	AVStream& outputStream = _outputFile->getFormatContext().getAVStream( _streamIndex );
+	const AVStream& outputStream = _outputFile->getFormatContext().getAVStream( _streamIndex );
 	return outputStream.nb_frames;
 }
 

@@ -43,6 +43,9 @@ StreamTranscoder::StreamTranscoder(
 	{
 		case AVMEDIA_TYPE_VIDEO :
 		{
+			// output stream
+			_outputStream = &outputFile.addVideoStream( _inputStream->getVideoCodec() );
+
 			VideoFrameDesc inputFrameDesc( _inputStream->getVideoCodec().getVideoFrameDesc() );
 
 			// generator decoder
@@ -58,17 +61,24 @@ StreamTranscoder::StreamTranscoder(
 			_transform = new VideoTransform();
 
 			// output encoder
-			VideoEncoder* outputVideo = new VideoEncoder( _inputStream->getVideoCodec().getCodecName() );
-			outputVideo->setupVideoEncoder( inputFrameDesc );
-			_outputEncoder = outputVideo;
-
-			// output stream
-			_outputStream = &outputFile.addVideoStream( _inputStream->getVideoCodec() );
+			try
+			{
+				VideoEncoder* outputVideo = new VideoEncoder( _inputStream->getVideoCodec().getCodecName() );
+				outputVideo->setupVideoEncoder( inputFrameDesc );
+				_outputEncoder = outputVideo;
+			}
+			catch( std::runtime_error& e )
+			{
+				LOG_ERROR( "Cannot create the video encoder for stream " << _inputStream->getStreamIndex() << " if needed. " << e.what() )
+			}
 
 			break;
 		}
 		case AVMEDIA_TYPE_AUDIO :
 		{
+			// output stream
+			_outputStream = &outputFile.addAudioStream( _inputStream->getAudioCodec() );
+
 			AudioFrameDesc inputFrameDesc( _inputStream->getAudioCodec().getAudioFrameDesc() );
 
 			// generator decoder
@@ -84,12 +94,16 @@ StreamTranscoder::StreamTranscoder(
 			_transform = new AudioTransform();
 
 			// output encoder
-			AudioEncoder* outputAudio = new AudioEncoder( _inputStream->getAudioCodec().getCodecName()  );
-			outputAudio->setupAudioEncoder( inputFrameDesc );
-			_outputEncoder = outputAudio;
-
-			// output stream
-			_outputStream = &outputFile.addAudioStream( _inputStream->getAudioCodec() );
+			try
+			{
+				AudioEncoder* outputAudio = new AudioEncoder( _inputStream->getAudioCodec().getCodecName()  );
+				outputAudio->setupAudioEncoder( inputFrameDesc );
+				_outputEncoder = outputAudio;
+			}
+			catch( std::runtime_error& e )
+			{
+				LOG_ERROR( "Cannot create the audio encoder for stream " << _inputStream->getStreamIndex() << " if needed. " << e.what() )
+			}
 
 			break;
 		}
@@ -300,6 +314,9 @@ StreamTranscoder::~StreamTranscoder()
 
 void StreamTranscoder::preProcessCodecLatency()
 {
+	if( _outputEncoder == NULL )
+		return;
+
 	int latency = _outputEncoder->getCodec().getLatency();
 
 	LOG_DEBUG( "Latency of stream: " << latency )
@@ -326,7 +343,7 @@ bool StreamTranscoder::processFrame()
 	// Manage offset
 	if( _offset > 0 )
 	{
-		bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
+		const bool endOfOffset = _outputStream->getStreamDuration() >= _offset;
 		if( endOfOffset )
 		{
 			LOG_INFO( "End of positive offset" )
@@ -349,7 +366,7 @@ bool StreamTranscoder::processFrame()
 	}
 	else if( _offset < 0 )
 	{
-		bool endOfStream = _outputStream->getStreamDuration() >= ( _inputStream->getDuration() + _offset );
+		const bool endOfStream = _outputStream->getStreamDuration() >= ( _inputStream->getDuration() + _offset );
 		if( endOfStream )
 		{
 			LOG_INFO( "End of negative offset" )
@@ -371,7 +388,7 @@ bool StreamTranscoder::processRewrap()
 	assert( _outputStream != NULL );
 	assert( _inputDecoder == NULL );
 
-	LOG_DEBUG( "Rewrap a frame" )
+	LOG_DEBUG( "StreamTranscoder::processRewrap" )
 
 	// if switched to generator, process frame
 	if( _currentDecoder == _generator )
@@ -379,7 +396,6 @@ bool StreamTranscoder::processRewrap()
 		return processTranscode();
 	}
 
-	LOG_DEBUG( "read next packet" )
 	CodedData data;
 	if( ! _inputStream->readNextPacket( data ) )
 	{
@@ -391,9 +407,7 @@ bool StreamTranscoder::processRewrap()
 		return false;
 	}
 
-	LOG_DEBUG( "wrap (" << data.getSize() << " bytes)" )
-	IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
-
+	const IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
 	switch( wrappingStatus )
 	{
 		case IOutputStream::eWrappingSuccess:
@@ -417,9 +431,9 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	assert( _frameBuffer    != NULL );
 	assert( _transform      != NULL );
 
-	LOG_DEBUG( "Transcode a frame" )
+	LOG_DEBUG( "StreamTranscoder::processTranscode" )
 
-	LOG_DEBUG( "decode next frame" )
+	LOG_DEBUG( "Decode next frame" )
 	bool decodingStatus = false;
 	if( subStreamIndex < 0 )
 		decodingStatus = _currentDecoder->decodeNextFrame( *_sourceBuffer );
@@ -429,15 +443,15 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	CodedData data;
 	if( decodingStatus )
 	{
-		LOG_DEBUG( "convert (" << _sourceBuffer->getSize() << " bytes)" )
+		LOG_DEBUG( "Convert (" << _sourceBuffer->getSize() << " bytes)" )
 		_transform->convert( *_sourceBuffer, *_frameBuffer );
 
-		LOG_DEBUG( "encode (" << _frameBuffer->getSize() << " bytes)" )
+		LOG_DEBUG( "Encode (" << _frameBuffer->getSize() << " bytes)" )
 		_outputEncoder->encodeFrame( *_frameBuffer, data );
 	}
 	else
 	{
-		LOG_DEBUG( "encode last frame(s)" )
+		LOG_DEBUG( "Encode last frame(s)" )
 		if( ! _outputEncoder->encodeFrame( data ) )
 		{
 			if( _canSwitchToGenerator )
@@ -450,8 +464,7 @@ bool StreamTranscoder::processTranscode( const int subStreamIndex )
 	}
 
 	LOG_DEBUG( "wrap (" << data.getSize() << " bytes)" )
-	IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
-
+	const IOutputStream::EWrappingStatus wrappingStatus = _outputStream->wrap( data );
 	switch( wrappingStatus )
 	{
 		case IOutputStream::eWrappingSuccess:

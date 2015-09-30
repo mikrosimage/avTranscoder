@@ -30,12 +30,8 @@ IOutputStream& OutputFile::addVideoStream( const VideoCodec& videoDesc )
 {
 	AVStream& stream = _formatContext.addAVStream( videoDesc.getAVCodec() );
 
-	stream.codec->width  = videoDesc.getAVCodecContext().width;
-	stream.codec->height = videoDesc.getAVCodecContext().height;
-	stream.codec->bit_rate = videoDesc.getAVCodecContext().bit_rate;
-	stream.codec->pix_fmt = videoDesc.getAVCodecContext().pix_fmt;
-	stream.codec->profile = videoDesc.getAVCodecContext().profile;
-	stream.codec->level = videoDesc.getAVCodecContext().level;
+	// copy video codec settings from input
+	avcodec_copy_context( stream.codec, &videoDesc.getAVCodecContext() );
 
 	// need to set the time_base on the AVCodecContext and the AVStream
 	// compensating the frame rate with the ticks_per_frame and keeping
@@ -59,9 +55,8 @@ IOutputStream& OutputFile::addAudioStream( const AudioCodec& audioDesc )
 {
 	AVStream& stream = _formatContext.addAVStream( audioDesc.getAVCodec() );
 
-	stream.codec->sample_rate = audioDesc.getAVCodecContext().sample_rate;
-	stream.codec->channels = audioDesc.getAVCodecContext().channels;
-	stream.codec->sample_fmt = audioDesc.getAVCodecContext().sample_fmt;
+	// copy audio codec settings from input
+	avcodec_copy_context( stream.codec, &audioDesc.getAVCodecContext() );
 
 	OutputStream* avOutputStream = new OutputStream( *this, _formatContext.getNbStreams() - 1 );
 	_outputStreams.push_back( avOutputStream );
@@ -71,7 +66,10 @@ IOutputStream& OutputFile::addAudioStream( const AudioCodec& audioDesc )
 
 IOutputStream& OutputFile::addDataStream( const DataCodec& dataDesc )
 {
-	_formatContext.addAVStream( dataDesc.getAVCodec() );
+	AVStream& stream = _formatContext.addAVStream( dataDesc.getAVCodec() );
+
+	// copy data codec settings from input
+	avcodec_copy_context( stream.codec, &dataDesc.getAVCodecContext() );
 
 	OutputStream* avOutputStream = new OutputStream( *this, _formatContext.getNbStreams() - 1 );
 	_outputStreams.push_back( avOutputStream );
@@ -144,18 +142,11 @@ IOutputStream::EWrappingStatus OutputFile::wrap( const CodedData& data, const si
 
 	LOG_DEBUG( "Wrap on stream " << streamId << " (" << data.getSize() << " bytes for frame " << _frameCount.at( streamId ) << ")" )
 
-	AVPacket packet;
-	av_init_packet( &packet );
-	packet.stream_index = streamId;
-	packet.data = (uint8_t*)data.getData();
-	packet.size = data.getSize();
+	AVPacket& packetToWrap = const_cast<AVPacket&>( data.getAVPacket() );
+	packetToWrap.stream_index = streamId;
+	_formatContext.writeFrame( packetToWrap );
 
-	_formatContext.writeFrame( packet );
-
-	// free packet.side_data, set packet.data to NULL and packet.size to 0
-	av_free_packet( &packet );
-
-	double currentStreamDuration = _outputStreams.at( streamId )->getStreamDuration();
+	const double currentStreamDuration = _outputStreams.at( streamId )->getStreamDuration();
 	if( currentStreamDuration < _previousProcessedStreamDuration )
 	{
 		// if the current stream is strictly shorter than the previous, wait for more data
@@ -163,8 +154,8 @@ IOutputStream::EWrappingStatus OutputFile::wrap( const CodedData& data, const si
 	}
 
 	_previousProcessedStreamDuration = currentStreamDuration;
-	
 	_frameCount.at( streamId )++;
+
 	return IOutputStream::eWrappingSuccess;
 }
 

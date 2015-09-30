@@ -25,8 +25,8 @@ def testEProcessMethodShortest():
 	transcoder = av.Transcoder( ouputFile )
         transcoder.setProcessMethod( av.eProcessMethodShortest )
 
-	transcoder.add( inputFileName_longest, 0, "" )
-	transcoder.add( inputFileName_shortest, 0, "" )
+	transcoder.add( inputFileName_longest, 0 )
+	transcoder.add( inputFileName_shortest, 0 )
 
 	progress = av.ConsoleProgress()
 	transcoder.process( progress )
@@ -54,8 +54,8 @@ def testEProcessMethodLongest():
 	transcoder = av.Transcoder( ouputFile )
         transcoder.setProcessMethod( av.eProcessMethodLongest )
 
-	transcoder.add( inputFileName_longest, 0, "" )
-	transcoder.add( inputFileName_shortest, 0, "" )
+	transcoder.add( inputFileName_longest, 0 )
+	transcoder.add( inputFileName_shortest, 0 )
 
 	progress = av.ConsoleProgress()
 	transcoder.process( progress )
@@ -84,9 +84,9 @@ def testEProcessMethodBasedOnStream():
 	transcoder = av.Transcoder( ouputFile )
         transcoder.setProcessMethod( av.eProcessMethodBasedOnStream, 1 )
 
-	transcoder.add( inputFileName_first, 0, "" )
-	transcoder.add( inputFileName_second, 0, "" )
-	transcoder.add( inputFileName_third, 0, "" )
+	transcoder.add( inputFileName_first, 0 )
+	transcoder.add( inputFileName_second, 0, "wave16b48kmono" )
+	transcoder.add( inputFileName_third, 0 )
 
 	progress = av.ConsoleProgress()
 	transcoder.process( progress )
@@ -115,9 +115,9 @@ def testEProcessMethodBasedOnDuration():
 	transcoder = av.Transcoder( ouputFile )
         transcoder.setProcessMethod( av.eProcessMethodBasedOnDuration, 0, 50 )
 
-	transcoder.add( inputFileName_first, 0, "" )
-	transcoder.add( inputFileName_second, 0, "" )
-	transcoder.add( inputFileName_third, 0, "" )
+	transcoder.add( inputFileName_first, 0 )
+	transcoder.add( inputFileName_second, 0, "wave16b48kmono" )
+	transcoder.add( inputFileName_third, 0 )
 
 	progress = av.ConsoleProgress()
 	transcoder.process( progress )
@@ -127,4 +127,3 @@ def testEProcessMethodBasedOnDuration():
 	dst_properties = dst_inputFile.getProperties()
 
 	assert_equals( dst_properties.getDuration(), 50 )
-

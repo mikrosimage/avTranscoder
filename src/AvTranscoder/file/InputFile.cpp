@@ -60,22 +60,25 @@ bool InputFile::readNextPacket( CodedData& data, const size_t streamIndex )
 	bool nextPacketFound = false;
 	while( ! nextPacketFound )
 	{
-		int ret = av_read_frame( &_formatContext.getAVFormatContext(), &data.getAVPacket() );
+		const int ret = av_read_frame( &_formatContext.getAVFormatContext(), &data.getAVPacket() );
 		if( ret < 0 ) // error or end of file
 		{
+			LOG_INFO( "No more data to read on file '" << _filename << "'" )
 			return false;
 		}
 
 		// if the packet stream is the expected one
 		// return the packet data
-		int packetStreamIndex = data.getAVPacket().stream_index;
+		const int packetStreamIndex = data.getAVPacket().stream_index;
 		if( packetStreamIndex == (int)streamIndex )
 		{
+			LOG_DEBUG( "Get a packet data of the stream " << streamIndex )
 			nextPacketFound = true;
 		}
 		// else add the packet data to the stream cache
 		else
 		{
+			LOG_DEBUG( "Add a packet data for the stream " << packetStreamIndex << " to the cache" )
 			_inputStreams.at( packetStreamIndex )->addPacket( data.getAVPacket() );
 			data.clear();
 		}
@@ -85,13 +88,13 @@ bool InputFile::readNextPacket( CodedData& data, const size_t streamIndex )
 
 bool InputFile::seekAtFrame( const size_t frame, const int flag )
 {
-	uint64_t position = frame / getFps() * AV_TIME_BASE;
+	const uint64_t position = frame / getFps() * AV_TIME_BASE;
 	return _formatContext.seek( position, flag );
 }
 
 bool InputFile::seekAtTime( const double time, const int flag )
 {
-	uint64_t position = time * AV_TIME_BASE;
+	const uint64_t position = time * AV_TIME_BASE;
 	return _formatContext.seek( position, flag );
 }
 
