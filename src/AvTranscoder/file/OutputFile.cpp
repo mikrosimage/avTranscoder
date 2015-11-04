@@ -171,6 +171,10 @@ IOutputStream::EWrappingStatus OutputFile::wrap( const CodedData& data, const si
 	packet.stream_index = streamIndex;
 	packet.data = (uint8_t*)data.getData();
 	packet.size = data.getSize();
+	// copy timing information
+	packet.duration = data.getAVPacket().duration;
+	packet.pts = data.getAVPacket().pts;
+	packet.dts = data.getAVPacket().dts;
 
 	_formatContext.writeFrame( packet );
 
