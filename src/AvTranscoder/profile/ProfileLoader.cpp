@@ -2,6 +2,10 @@
 
 #include "util.hpp"
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
+
 #include <fstream>
 #include <cstdlib>
 #include <stdexcept>
@@ -9,28 +13,13 @@
 namespace avtranscoder
 {
 
+const std::string ProfileLoader::profileExt = ".prf";
+const std::string ProfileLoader::profileFFmpegExt = ".ffpreset";
+
 ProfileLoader::ProfileLoader( bool autoload )
 {
 	if( autoload )
 		loadProfiles();
-}
-
-void ProfileLoader::loadProfile( const std::string& avProfileFileName )
-{
-	std::ifstream infile;
-	infile.open( avProfileFileName.c_str(), std::ifstream::in );
-
-	ProfileLoader::Profile customProfile;
-
-	std::string line;
-	while( std::getline( infile, line ) )
-	{
-		std::vector< std::string > keyValue;
-		split( keyValue, line, "=" );
-		if( keyValue.size() == 2 )
-			customProfile[ keyValue.at( 0 ) ] = keyValue.at( 1 );
-	}
-	loadProfile( customProfile );
 }
 
 void ProfileLoader::loadProfiles( const std::string& avProfilesPath )
@@ -56,10 +45,14 @@ void ProfileLoader::loadProfiles( const std::string& avProfilesPath )
 
 		for( std::vector< std::string >::iterator fileIt = files.begin(); fileIt != files.end(); ++fileIt )
 		{
-			const std::string absPath = ( *dirIt ) + "/" + ( *fileIt );
+
+			if( fileIt->find( ProfileLoader::profileExt ) == std::string::npos &&
+			    fileIt->find( ProfileLoader::profileFFmpegExt ) == std::string::npos )
+				continue;
+
 			try
 			{
-				loadProfile( absPath );
+				loadProfile( *dirIt, *fileIt );
 			}
 			catch( const std::exception& e )
 			{
@@ -69,18 +62,76 @@ void ProfileLoader::loadProfiles( const std::string& avProfilesPath )
 	}
 }
 
+void ProfileLoader::loadProfile( const std::string& avProfileDir, const std::string& avProfileFileName )
+{
+	const std::string absPath = avProfileDir + "/" + avProfileFileName;
+
+	std::ifstream infile;
+	infile.open( absPath.c_str(), std::ifstream::in );
+
+	ProfileLoader::Profile customProfile;
+
+	std::string line;
+	while( std::getline( infile, line ) )
+	{
+		std::vector< std::string > keyValue;
+		split( keyValue, line, "=" );
+		if( keyValue.size() == 2 )
+			customProfile[ keyValue.at( 0 ) ] = keyValue.at( 1 );
+	}
+
+	// complete ffpreset
+	if( avProfileFileName.find( ProfileLoader::profileFFmpegExt ) != std::string::npos )
+	{
+		customProfile[ constants::avProfileIdentificator ] = avProfileFileName;
+		customProfile[ constants::avProfileIdentificatorHuman ] = avProfileFileName;
+
+		if( customProfile.count( "vcodec" ) )
+		{
+			customProfile[ constants::avProfileType ] = constants::avProfileTypeVideo;
+			customProfile[ constants::avProfileCodec ] = customProfile.at( "vcodec" );
+		}
+		else if( customProfile.count( "acodec" ) )
+		{
+			customProfile[ constants::avProfileType ] = constants::avProfileTypeAudio;
+			customProfile[ constants::avProfileCodec ] = customProfile.at( "vcodec" );
+		}
+		// get codec info from preset filename
+		else
+		{
+			const std::string codecName = avProfileFileName.substr( 0, avProfileFileName.find("-") );
+			const AVCodecDescriptor* codecDesc = avcodec_descriptor_get_by_name( codecName.c_str() );
+			if( codecDesc )
+			{
+				const AVMediaType codecType = codecDesc->type;
+				if( codecType == AVMEDIA_TYPE_VIDEO )
+					customProfile[ constants::avProfileType ] = constants::avProfileTypeVideo;
+				else if( codecType == AVMEDIA_TYPE_AUDIO )
+					customProfile[ constants::avProfileType ] = constants::avProfileTypeAudio;
+				else
+					LOG_WARN( "Cannot manage ffpreset which are not for video or audio ")
+				customProfile[ constants::avProfileCodec ] = std::string( codecDesc->name );
+			}
+			else
+				LOG_WARN( "Cannot manage ffpreset which has unknown codec name ( " + codecName + " )." )
+		}
+	}
+
+	loadProfile( customProfile );
+}
+
 void ProfileLoader::loadProfile( const Profile& profile )
 {
 	// check profile identificator
 	if( ! profile.count( constants::avProfileIdentificator ) )
 	{
-		throw std::runtime_error( "Warning: A profile has no name. It will not be loaded." );
+		throw std::runtime_error( "A profile has no name. It will not be loaded." );
 	}
 
 	// check profile type
 	if( profile.count( constants::avProfileType ) == 0 )
 	{
-		throw std::runtime_error( "Warning: The profile " + profile.find( constants::avProfileIdentificator )->second + " has not type. It will not be loaded." );
+		throw std::runtime_error( "The profile " + profile.find( constants::avProfileIdentificator )->second + " has not type. It will not be loaded." );
 	}
 
 	// check complete profile
