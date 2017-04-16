@@ -46,7 +46,8 @@ public:
 	OptionArray getOptions();  ///< Get options as array
 	OptionMap& getOptionsMap() { return _options; }  ///< Get options as map
 
-	Option& getOption( const std::string& optionName ) { return _options.at(optionName); }
+	///< @note Can specify an index because a name can fetch with several options (which is rare and so by default we give the first option of the list)
+	Option& getOption( const std::string& optionName, const size_t index = 0 ) { return _options.at( optionName ).at( index ); }
 	
 #ifndef SWIG
 	AVCodecContext& getAVCodecContext() { return *_avCodecContext; }

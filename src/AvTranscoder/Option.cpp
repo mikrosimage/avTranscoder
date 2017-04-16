@@ -228,7 +228,6 @@ void loadOptions( OptionMap& outOptions, void* av_class, int req_flags )
 	if( ! av_class )
 		return;
 
-	std::multimap<std::string, std::string> optionUnitToParentName;
 	std::vector<Option> childOptions;
 	
 	const AVOption* avOption = NULL;
@@ -255,39 +254,48 @@ void loadOptions( OptionMap& outOptions, void* av_class, int req_flags )
 		}
 		else
 		{
-			outOptions.insert( std::make_pair( option.getName(), option ) );
-			optionUnitToParentName.insert( std::make_pair( option.getUnit(), option.getName() ) );
+			OptionMap::iterator itOption = outOptions.find( option.getName() );
+
+			if( itOption != outOptions.end() )
+				itOption->second.push_back( option );
+			else
+				outOptions.insert( std::make_pair( option.getName(), std::vector<Option>(1, option ) ) );
 		}
 	}
 
 	// iterate on child options
-	for( std::vector<Option>::iterator itOption = childOptions.begin(); itOption != childOptions.end(); ++itOption )
+	for( OptionArray::iterator itChildOption = childOptions.begin(); itChildOption != childOptions.end(); ++itChildOption )
 	{
 		bool parentFound = false;
-		for( std::multimap<std::string, std::string>::iterator itUnit = optionUnitToParentName.begin(); itUnit != optionUnitToParentName.end(); ++itUnit )
+
+		// looking for a parent option
+		// need to compare unit of all options with the unit of the child
+		// => name of parent option could be different from its unit...
+		for( OptionMap::iterator itParentOption = outOptions.begin(); itParentOption != outOptions.end(); ++itParentOption )
 		{
-			if( itUnit->first == itOption->getUnit() )
+			for( size_t indexParentOption = 0; indexParentOption < itParentOption->second.size(); ++indexParentOption )
 			{
-				std::string nameParentOption = itUnit->second;
-				Option& parentOption = outOptions.at( nameParentOption );
-
-				parentOption.appendChild( *itOption );
-
-				// child of a Choice
-				if( parentOption.getType() == eOptionBaseTypeChoice )
+				Option& parentOption = itParentOption->second.at( indexParentOption );
+				if( parentOption.getUnit() == itChildOption->getUnit() )
 				{
-					if( itOption->getDefaultInt() == parentOption.getDefaultInt() )
-						parentOption.setDefaultChildIndex( parentOption.getChilds().size() - 1 );
-				}
+					parentOption.appendChild( *itChildOption );
 
-				parentFound = true;
-				break;
+					// child of a Choice: set default value
+					if( parentOption.getType() == eOptionBaseTypeChoice )
+					{
+						if( itChildOption->getDefaultInt() == parentOption.getDefaultInt() )
+							parentOption.setDefaultChildIndex( parentOption.getChilds().size() - 1 );
+					}
+
+					parentFound = true;
+					break;
+				}
+				continue;
 			}
 		}
-
 		if( ! parentFound )
 		{
-			LOG_WARN( "Can't find a choice option for " << itOption->getName() )
+			LOG_WARN( "Can't find a parent option for child " << itChildOption->getName() << "(unit: " << itChildOption->getUnit() << ")" )
 		}
 	}
 }
@@ -298,7 +306,10 @@ void loadOptions( OptionArray& outOptions, void* av_class, int req_flags )
 	loadOptions( optionMap, av_class, req_flags );
 
 	for( OptionMap::iterator it = optionMap.begin(); it != optionMap.end(); ++it )
-		outOptions.push_back( it->second );
+	{
+		for( size_t optionIndex = 0; optionIndex < it->second.size(); ++optionIndex )
+			outOptions.push_back( it->second.at( optionIndex ) );
+	}
 }
 
 }

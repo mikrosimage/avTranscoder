@@ -116,7 +116,11 @@ private:
 };
 
 typedef std::vector<Option> OptionArray;
-typedef std::map<std::string, Option> OptionMap;  ///< Key: option name / value: option
+/**
+ * @brief Key: option name / value: array of options
+ * @note value is of type 'OptionArray' because we can have several options with the same name
+ */
+typedef std::map<std::string, OptionArray> OptionMap;
 
 /**
  * @param outOptions: map or array of options
